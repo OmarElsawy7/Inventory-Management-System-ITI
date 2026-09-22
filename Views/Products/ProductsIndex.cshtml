@@ -1,0 +1,1201 @@
+﻿@model List<InventorySystem.Models.Product>
+
+@{
+    ViewData["Title"] = "Products";
+
+    List<InventorySystem.Models.Category> categories =
+        ViewBag.Categories
+        ?? new List<InventorySystem.Models.Category>();
+
+
+    int currentPage =
+        ViewBag.CurrentPage ?? 1;
+
+
+    int totalPages =
+        ViewBag.TotalPages ?? 0;
+
+
+    int totalItems =
+        ViewBag.TotalItems ?? 0;
+
+
+    string search =
+        ViewBag.Search as string ?? "";
+
+
+    int? categoryId =
+        ViewBag.CategoryId;
+
+
+    string stockStatus =
+        ViewBag.StockStatus as string ?? "";
+
+
+    bool hasFilters =
+        !string.IsNullOrWhiteSpace(search)
+        ||
+        categoryId.HasValue
+        ||
+        !string.IsNullOrWhiteSpace(stockStatus);
+}
+
+
+<style>
+
+    /* =====================================
+           Header
+        ===================================== */
+
+    .products-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .products-title {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 750;
+        color: #1f2937;
+    }
+
+    .products-subtitle {
+        margin: 5px 0 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .product-count {
+        display: inline-flex;
+        align-items: center;
+        margin-top: 9px;
+        padding: 5px 11px;
+        border-radius: 50px;
+        background: #e9f7ef;
+        color: #198754;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .add-product-btn {
+        background: #198754;
+        color: white;
+        text-decoration: none;
+        padding: 11px 20px;
+        border-radius: 9px;
+        font-weight: 650;
+        transition: .2s;
+        box-shadow: 0 5px 15px rgba(25,135,84,.12);
+    }
+
+        .add-product-btn:hover {
+            background: #146c43;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+
+    /* =====================================
+           Alerts
+        ===================================== */
+
+    .custom-alert {
+        border: none;
+        border-radius: 11px;
+        margin-bottom: 20px;
+    }
+
+
+    /* =====================================
+           Filters
+        ===================================== */
+
+    .filter-card {
+        background: #f8faf9;
+        border: 1px solid #e4ebe7;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .filter-title {
+        color: #1f2937;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .filter-label {
+        font-size: 12px;
+        font-weight: 650;
+        color: #4b5563;
+        margin-bottom: 6px;
+    }
+
+    .filter-card .form-control,
+    .filter-card .form-select {
+        border-radius: 8px;
+        border-color: #dce4df;
+        min-height: 39px;
+    }
+
+        .filter-card .form-control:focus,
+        .filter-card .form-select:focus {
+            border-color: #65b98a;
+            box-shadow: 0 0 0 .2rem rgba(25,135,84,.10);
+        }
+
+    .apply-filter-btn {
+        min-height: 39px;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+
+    .reset-filter-btn {
+        min-height: 39px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+
+
+    /* =====================================
+           Table
+        ===================================== */
+
+    .products-table-wrapper {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        background: white;
+    }
+
+    .products-table {
+        margin-bottom: 0;
+    }
+
+        .products-table thead {
+            background: #f4f7f5;
+        }
+
+        .products-table th {
+            padding: 14px;
+            color: #374151;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            border-bottom: 1px solid #dfe7e2;
+        }
+
+        .products-table td {
+            padding: 14px;
+            vertical-align: middle;
+            color: #4b5563;
+        }
+
+        .products-table tbody tr {
+            transition: background-color .2s;
+        }
+
+            .products-table tbody tr:hover {
+                background: #fbfdfc;
+            }
+
+
+    /* =====================================
+           Product
+        ===================================== */
+
+    .product-main {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .product-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #e9f7ef;
+        color: #198754;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    .product-name {
+        color: #1f2937;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .product-sku {
+        font-size: 11px;
+        color: #84918b;
+        margin-top: 2px;
+    }
+
+    .category-badge {
+        display: inline-block;
+        background: #f3f4f6;
+        color: #4b5563;
+        border-radius: 50px;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .price-value {
+        color: #1f2937;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+
+    /* =====================================
+           Stock Status
+        ===================================== */
+
+    .stock-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .stock-quantity {
+        font-weight: 750;
+        color: #1f2937;
+    }
+
+    .stock-badge {
+        display: inline-block;
+        border-radius: 50px;
+        padding: 4px 9px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .stock-in {
+        background: #e8f7ef;
+        color: #198754;
+    }
+
+    .stock-low {
+        background: #fff4d6;
+        color: #b7791f;
+    }
+
+    .stock-out {
+        background: #fdeaea;
+        color: #dc3545;
+    }
+
+
+    /* =====================================
+           Actions
+        ===================================== */
+
+    .action-group {
+        display: flex;
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+
+    .action-btn {
+        text-decoration: none;
+        border: none;
+        border-radius: 7px;
+        padding: 7px 11px;
+        font-size: 12px;
+        font-weight: 650;
+        transition: .2s;
+        white-space: nowrap;
+    }
+
+    .details-btn {
+        background: #eef4ff;
+        color: #2563eb;
+    }
+
+        .details-btn:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+    .edit-btn {
+        background: #fff7df;
+        color: #b7791f;
+    }
+
+        .edit-btn:hover {
+            background: #d69e2e;
+            color: white;
+        }
+
+    .delete-btn {
+        background: #fff0f0;
+        color: #dc3545;
+    }
+
+        .delete-btn:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+
+    /* =====================================
+           Empty State
+        ===================================== */
+
+    .empty-state {
+        border: 1px dashed #cbd5cf;
+        background: #fafcfb;
+        border-radius: 16px;
+        padding: 50px 25px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 55px;
+        height: 55px;
+        margin: 0 auto 15px;
+        border-radius: 15px;
+        background: #e9f7ef;
+        color: #198754;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 21px;
+        font-weight: 800;
+    }
+
+    .empty-state h4 {
+        color: #1f2937;
+        font-weight: 700;
+    }
+
+    .empty-state p {
+        color: #7b8781;
+        margin-bottom: 18px;
+    }
+
+
+    /* =====================================
+           Pagination
+        ===================================== */
+
+    .pagination-area {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 25px;
+    }
+
+    .page-info {
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 0 8px;
+    }
+
+    .page-btn {
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+
+    /* =====================================
+           Delete Modal
+        ===================================== */
+
+    .delete-modal-icon {
+        width: 55px;
+        height: 55px;
+        margin: 0 auto 15px;
+        border-radius: 50%;
+        background: #fff0f0;
+        color: #dc3545;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 25px;
+        font-weight: 800;
+    }
+
+    .modal-content {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0,0,0,.15);
+    }
+
+
+    @@media(max-width: 768px) {
+
+        .products-title {
+            font-size: 27px;
+        }
+
+        .action-group {
+            flex-wrap: wrap;
+        }
+    }
+
+</style>
+
+
+
+<!-- =====================================
+     Header
+===================================== -->
+
+<div class="products-header">
+
+    <div>
+
+        <h1 class="products-title">
+            Products
+        </h1>
+
+        <p class="products-subtitle">
+            Manage product information, prices and inventory stock.
+        </p>
+
+        <div class="product-count">
+
+            @totalItems Product(s) Found
+
+        </div>
+
+    </div>
+
+
+    <a asp-action="Create"
+       class="add-product-btn">
+
+        + Add New Product
+
+    </a>
+
+</div>
+
+
+
+<!-- =====================================
+     Success
+===================================== -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show custom-alert"
+         role="alert">
+
+        <strong>Success!</strong>
+        @TempData["Success"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close">
+        </button>
+
+    </div>
+}
+
+
+
+<!-- =====================================
+     Error
+===================================== -->
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show custom-alert"
+         role="alert">
+
+        <strong>Unable to complete action.</strong>
+        @TempData["Error"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close">
+        </button>
+
+    </div>
+}
+
+
+
+<!-- =====================================
+     Filters
+===================================== -->
+
+<div class="filter-card">
+
+    <div class="filter-title">
+        Search & Filter Products
+    </div>
+
+
+    <form method="get"
+          asp-action="Index">
+
+        <div class="row g-3 align-items-end">
+
+
+            <!-- Search -->
+
+            <div class="col-lg-4 col-md-6">
+
+                <label class="filter-label">
+                    Search
+                </label>
+
+                <input type="text"
+                       name="search"
+                       class="form-control"
+                       placeholder="Search by product name or SKU..."
+                       value="@search" />
+
+            </div>
+
+
+
+            <!-- Category -->
+
+            <div class="col-lg-3 col-md-6">
+
+                <label class="filter-label">
+                    Category
+                </label>
+
+
+                <select name="categoryId"
+                        class="form-select">
+
+                    <option value="">
+                        All Categories
+                    </option>
+
+
+                    @foreach (var cat in categories)
+                    {
+                        if (categoryId == cat.CategoryID)
+                        {
+                            <option value="@cat.CategoryID"
+                                    selected>
+
+                                @cat.CategoryName
+
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@cat.CategoryID">
+
+                                @cat.CategoryName
+
+                            </option>
+                        }
+                    }
+
+                </select>
+
+            </div>
+
+
+
+            <!-- Stock -->
+
+            <div class="col-lg-3 col-md-6">
+
+                <label class="filter-label">
+                    Stock Status
+                </label>
+
+
+                <select name="stockStatus"
+                        class="form-select">
+
+                    <option value="">
+                        All Stock Status
+                    </option>
+
+
+                    @if (stockStatus == "InStock")
+                    {
+                        <option value="InStock"
+                                selected>
+
+                            In Stock
+
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="InStock">
+                            In Stock
+                        </option>
+                    }
+
+
+                    @if (stockStatus == "LowStock")
+                    {
+                        <option value="LowStock"
+                                selected>
+
+                            Low Stock
+
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="LowStock">
+                            Low Stock
+                        </option>
+                    }
+
+
+                    @if (stockStatus == "OutOfStock")
+                    {
+                        <option value="OutOfStock"
+                                selected>
+
+                            Out of Stock
+
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="OutOfStock">
+                            Out of Stock
+                        </option>
+                    }
+
+                </select>
+
+            </div>
+
+
+
+            <!-- Buttons -->
+
+            <div class="col-lg-2 col-md-6">
+
+                <div class="d-flex gap-2">
+
+                    <button type="submit"
+                            class="btn btn-success apply-filter-btn flex-grow-1">
+
+                        Apply
+
+                    </button>
+
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary reset-filter-btn">
+
+                        Reset
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+
+<!-- =====================================
+     No Products
+===================================== -->
+@if (Model.Count == 0)
+{
+    <div class="empty-state">
+
+        <div class="empty-icon">
+            P
+        </div>
+
+
+        @if (hasFilters)
+        {
+            <h4>
+                No matching products
+            </h4>
+
+            <p>
+                No products match your current search or filter options.
+            </p>
+
+            <a asp-action="Index"
+               class="btn btn-outline-success">
+
+                Clear Filters
+
+            </a>
+        }
+        else
+        {
+            <h4>
+                No products yet
+            </h4>
+
+            <p>
+                Add your first product to start managing inventory.
+            </p>
+
+            <a asp-action="Create"
+               class="btn btn-success">
+
+                + Add First Product
+
+            </a>
+        }
+
+    </div>
+}
+else
+{
+
+    <!-- =====================================
+         Products Table
+    ===================================== -->
+
+    <div class="table-responsive products-table-wrapper">
+
+        <table class="table products-table align-middle">
+
+            <thead>
+
+                <tr>
+
+                    <th>Product</th>
+
+                    <th>Category</th>
+
+                    <th>Unit Price</th>
+
+                    <th>Stock</th>
+
+                    <th>Low Stock At</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                @foreach (var product in Model)
+                {
+                    string productInitial =
+                        !string.IsNullOrWhiteSpace(product.ProductName)
+                            ? product.ProductName
+                                .Substring(0, 1)
+                                .ToUpper()
+                            : "P";
+
+
+                    string categoryName =
+                        categories
+                            .FirstOrDefault(
+                                c =>
+                                    c.CategoryID
+                                    ==
+                                    product.CategoryID
+                            )
+                            ?.CategoryName
+                        ?? "Uncategorized";
+
+
+                    string stockText;
+
+                    string stockClass;
+
+
+                    if (product.StockQuantity == 0)
+                    {
+                        stockText =
+                            "Out of Stock";
+
+                        stockClass =
+                            "stock-out";
+                    }
+                    else if (
+                        product.StockQuantity
+                        <=
+                        product.LowStockThreshold
+                    )
+                    {
+                        stockText =
+                            "Low Stock";
+
+                        stockClass =
+                            "stock-low";
+                    }
+                    else
+                    {
+                        stockText =
+                            "In Stock";
+
+                        stockClass =
+                            "stock-in";
+                    }
+
+
+                    <tr>
+
+
+                        <!-- Product -->
+
+                        <td>
+
+                            <div class="product-main">
+
+                                <div class="product-icon">
+
+                                    @productInitial
+
+                                </div>
+
+
+                                <div>
+
+                                    <div class="product-name">
+
+                                        @product.ProductName
+
+                                    </div>
+
+
+                                    <div class="product-sku">
+
+                                        SKU: @product.SKU
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+
+                        <!-- Category -->
+
+                        <td>
+
+                            <span class="category-badge">
+
+                                @categoryName
+
+                            </span>
+
+                        </td>
+
+
+
+                        <!-- Price -->
+
+                        <td>
+
+                            <span class="price-value">
+
+                                @(product.UnitPrice.ToString("N2"))
+                                EGP
+
+                            </span>
+
+                        </td>
+
+
+
+                        <!-- Stock -->
+
+                        <td>
+
+                            <div class="stock-wrapper">
+
+                                <span class="stock-quantity">
+
+                                    @product.StockQuantity Units
+
+                                </span>
+
+
+                                <span class="stock-badge @stockClass">
+
+                                    @stockText
+
+                                </span>
+
+                            </div>
+
+                        </td>
+
+
+
+                        <!-- Low Stock Threshold -->
+
+                        <td>
+
+                            @product.LowStockThreshold Units
+
+                        </td>
+
+
+
+                        <!-- Actions -->
+
+                        <td>
+
+                            <div class="action-group">
+
+
+                                <a asp-action="Details"
+                                   asp-route-id="@product.ProductID"
+                                   class="action-btn details-btn">
+
+                                    Details
+
+                                </a>
+
+
+                                <a asp-action="Edit"
+                                   asp-route-id="@product.ProductID"
+                                   class="action-btn edit-btn">
+
+                                    Edit
+
+                                </a>
+
+
+                                <button type="button"
+                                        class="action-btn delete-btn"
+                                        onclick="openDeleteProductModal(
+                                    @product.ProductID,
+                                    '@Html.Raw(
+                                                                                    System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(
+                                                                                        product.ProductName
+                                                                                    )
+                                                                                )'
+                                    )">
+
+                                    Delete
+
+                                </button>
+
+
+                            </div>
+
+                        </td>
+
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+
+    <!-- =====================================
+         Pagination
+    ===================================== -->
+    @if (totalPages > 1)
+    {
+        <div class="pagination-area">
+
+
+            @if (currentPage > 1)
+            {
+                <a asp-action="Index"
+                   asp-route-page="@(currentPage - 1)"
+                   asp-route-search="@search"
+                   asp-route-categoryId="@categoryId"
+                   asp-route-stockStatus="@stockStatus"
+                   class="btn btn-outline-secondary page-btn">
+
+                    Previous
+
+                </a>
+            }
+
+
+            <span class="page-info">
+
+                Page @currentPage of @totalPages
+
+            </span>
+
+
+            @if (currentPage < totalPages)
+            {
+                <a asp-action="Index"
+                   asp-route-page="@(currentPage + 1)"
+                   asp-route-search="@search"
+                   asp-route-categoryId="@categoryId"
+                   asp-route-stockStatus="@stockStatus"
+                   class="btn btn-outline-secondary page-btn">
+
+                    Next
+
+                </a>
+            }
+
+
+        </div>
+    }
+}
+
+
+
+<!-- =====================================
+     Delete Confirmation Modal
+===================================== -->
+
+<div class="modal fade"
+     id="deleteProductModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-body text-center p-4">
+
+                <div class="delete-modal-icon">
+                    !
+                </div>
+
+
+                <h4 class="fw-bold mb-2">
+                    Delete Product?
+                </h4>
+
+
+                <p class="text-muted mb-1">
+
+                    Are you sure you want to delete
+
+                </p>
+
+
+                <p class="fw-bold mb-2"
+                   id="deleteProductName">
+                </p>
+
+
+                <p class="text-muted small mb-0">
+
+                    Products that exist in purchase history cannot be deleted.
+
+                </p>
+
+            </div>
+
+
+            <div class="modal-footer border-0 justify-content-center pb-4">
+
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+
+                <a id="confirmDeleteProductButton"
+                   href="#"
+                   class="btn btn-danger">
+
+                    Yes, Delete Product
+
+                </a>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+@section Scripts
+{
+    <script>
+
+        function openDeleteProductModal(
+            productId,
+            productName
+        ) {
+
+            document
+                .getElementById(
+                    'deleteProductName'
+                )
+                .textContent =
+                productName;
+
+
+            const deleteUrl =
+                '@Url.Action("Delete", "Products")'
+                + '?id='
+                + productId;
+
+
+            document
+                .getElementById(
+                    'confirmDeleteProductButton'
+                )
+                .href =
+                deleteUrl;
+
+
+            const modalElement =
+                document.getElementById(
+                    'deleteProductModal'
+                );
+
+
+            const modal =
+                bootstrap.Modal
+                    .getOrCreateInstance(
+                        modalElement
+                    );
+
+
+            modal.show();
+
+        }
+
+    </script>
+}

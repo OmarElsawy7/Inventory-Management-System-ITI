@@ -1,0 +1,791 @@
+@model InventorySystem.ViewModels.SupplierDetailsViewModel
+
+@{
+    ViewData["Title"] = "Supplier Details";
+}
+
+
+<style>
+
+    /* =========================================
+           Header
+        ========================================= */
+
+    .supplier-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .supplier-title {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 750;
+        color: #1f2937;
+    }
+
+    .supplier-subtitle {
+        color: #6b7280;
+        margin-top: 5px;
+        margin-bottom: 0;
+    }
+
+    .supplier-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+
+    /* =========================================
+           Supplier Information
+        ========================================= */
+
+    .supplier-info-card {
+        background: linear-gradient( 135deg, #116b45, #198754 );
+        color: white;
+        border-radius: 18px;
+        padding: 28px;
+        margin-bottom: 25px;
+        box-shadow: 0 15px 35px rgba(25, 135, 84, .15);
+    }
+
+    .supplier-name {
+        font-size: 26px;
+        font-weight: 750;
+        margin-bottom: 20px;
+    }
+
+    .supplier-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .info-item {
+        background: rgba(255,255,255,.11);
+        border: 1px solid rgba(255,255,255,.15);
+        padding: 13px 16px;
+        border-radius: 10px;
+    }
+
+    .info-label {
+        color: rgba(255,255,255,.65);
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+
+    /* =========================================
+           KPI Cards
+        ========================================= */
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 35px;
+    }
+
+    .stat-card {
+        border: 1px solid #e5ebe7;
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        transition: .2s;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,.06);
+        }
+
+    .stat-label {
+        font-size: 12px;
+        color: #7a8780;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .stat-value {
+        font-size: 24px;
+        color: #1f2937;
+        font-weight: 750;
+    }
+
+    .stat-green {
+        color: #198754;
+    }
+
+
+    /* =========================================
+           Section
+        ========================================= */
+
+    .section-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 5px;
+    }
+
+    .section-description {
+        color: #7b8781;
+        font-size: 13px;
+        margin-bottom: 18px;
+    }
+
+
+    /* =========================================
+           Tables
+        ========================================= */
+
+    .custom-table {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 35px;
+    }
+
+        .custom-table table {
+            margin-bottom: 0;
+        }
+
+        .custom-table thead {
+            background: #f5f8f6;
+        }
+
+        .custom-table th {
+            padding: 13px 15px;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .custom-table td {
+            padding: 13px 15px;
+            vertical-align: middle;
+        }
+
+    .quantity-badge {
+        background: #e8f7ef;
+        color: #198754;
+        padding: 5px 10px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .purchase-number {
+        color: #198754;
+        font-weight: 700;
+    }
+
+    .money-value {
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+
+    /* =========================================
+           Empty State
+        ========================================= */
+
+    .empty-state {
+        border: 1px dashed #cbd5cf;
+        border-radius: 12px;
+        padding: 35px;
+        text-align: center;
+        color: #76827c;
+        margin-bottom: 30px;
+        background: #fafcfb;
+    }
+
+
+    /* =========================================
+           Responsive
+        ========================================= */
+
+    @@media(max-width: 900px) {
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+
+    @@media(max-width: 600px) {
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .supplier-info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+</style>
+
+
+
+<!-- =========================================
+     Header
+========================================= -->
+
+<div class="supplier-header">
+
+    <div>
+
+        <h1 class="supplier-title">
+            Supplier Details
+        </h1>
+
+        <p class="supplier-subtitle">
+            Supplier information, activity and purchase history.
+        </p>
+
+    </div>
+
+
+    <div class="supplier-actions">
+
+        <a asp-action="Edit"
+           asp-route-id="@Model.Supplier.SupplierID"
+           class="btn btn-outline-success">
+
+            Edit Supplier
+
+        </a>
+
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+
+            Back
+
+        </a>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================
+     Supplier Information
+========================================= -->
+
+<div class="supplier-info-card">
+
+    <div class="supplier-name">
+
+        @Model.Supplier.SupplierName
+
+    </div>
+
+
+    <div class="supplier-info-grid">
+
+
+        <!-- Contact Name -->
+
+        <div class="info-item">
+
+            <div class="info-label">
+                CONTACT NAME
+            </div>
+
+            <div class="info-value">
+
+                @(string.IsNullOrWhiteSpace(Model.Supplier.ContactName)
+                    ? "Not provided"
+                    : Model.Supplier.ContactName)
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Phone -->
+
+        <div class="info-item">
+
+            <div class="info-label">
+                PHONE
+            </div>
+
+            <div class="info-value">
+
+                @(string.IsNullOrWhiteSpace(Model.Supplier.Phone)
+                    ? "Not provided"
+                    : Model.Supplier.Phone)
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Email -->
+
+        <div class="info-item">
+
+            <div class="info-label">
+                EMAIL
+            </div>
+
+            <div class="info-value">
+
+                @(string.IsNullOrWhiteSpace(Model.Supplier.Email)
+                    ? "Not provided"
+                    : Model.Supplier.Email)
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Address -->
+
+        <div class="info-item">
+
+            <div class="info-label">
+                ADDRESS
+            </div>
+
+            <div class="info-value">
+
+                @(string.IsNullOrWhiteSpace(Model.Supplier.Address)
+                    ? "Not provided"
+                    : Model.Supplier.Address)
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================
+     Statistics
+========================================= -->
+
+<div class="stats-grid">
+
+
+    <!-- Total Purchases -->
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Total Purchases
+        </div>
+
+        <div class="stat-value stat-green">
+
+            @Model.TotalPurchases
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Total Purchase Value -->
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Total Purchase Value
+        </div>
+
+        <div class="stat-value">
+
+            @(Model.TotalPurchaseValue.ToString("N2"))
+
+            <small style="font-size:13px;">
+                EGP
+            </small>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Products Supplied -->
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Products Supplied
+        </div>
+
+        <div class="stat-value">
+
+            @Model.UniqueProductsSupplied
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Last Purchase -->
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Last Purchase
+        </div>
+
+        <div class="stat-value"
+             style="font-size:18px;">
+
+            @if (Model.LastPurchaseDate.HasValue)
+            {
+                @(Model.LastPurchaseDate.Value.ToString("dd/MM/yyyy"))
+            }
+            else
+            {
+                <span>No Purchases</span>
+            }
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =========================================
+     Products Supplied
+========================================= -->
+
+<h2 class="section-title">
+
+    Products Supplied
+
+</h2>
+
+
+<p class="section-description">
+
+    Products purchased from this supplier
+    and their total supplied quantities.
+
+</p>
+
+
+
+@if (Model.Products.Count == 0)
+{
+
+    <div class="empty-state">
+
+        No products have been purchased
+        from this supplier yet.
+
+    </div>
+
+}
+else
+{
+
+    <div class="table-responsive custom-table">
+
+        <table class="table table-hover align-middle">
+
+
+            <thead>
+
+                <tr>
+
+                    <th>SKU</th>
+
+                    <th>Product</th>
+
+                    <th>Total Supplied</th>
+
+                    <th>Current Stock</th>
+
+                    <th>Purchased Value</th>
+
+                </tr>
+
+            </thead>
+
+
+
+            <tbody>
+
+                @foreach (var product in Model.Products)
+                {
+
+                    <tr>
+
+                        <!-- SKU -->
+
+                        <td>
+
+                            @product.SKU
+
+                        </td>
+
+
+                        <!-- Product -->
+
+                        <td>
+
+                            <strong>
+                                @product.ProductName
+                            </strong>
+
+                        </td>
+
+
+                        <!-- Total Supplied -->
+
+                        <td>
+
+                            <span class="quantity-badge">
+
+                                @product.TotalQuantitySupplied Units
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- Current Stock -->
+
+                        <td>
+
+                            @product.CurrentStock
+
+                        </td>
+
+
+                        <!-- Purchased Value -->
+
+                        <td class="money-value">
+
+                            @(product.TotalPurchasedValue.ToString("N2"))
+                            EGP
+
+                        </td>
+
+                    </tr>
+
+                }
+
+            </tbody>
+
+
+        </table>
+
+    </div>
+
+}
+
+
+
+<!-- =========================================
+     Purchase History
+========================================= -->
+
+<div class="d-flex justify-content-between
+    align-items-center
+    flex-wrap
+    gap-2">
+
+
+    <div>
+
+        <h2 class="section-title">
+
+            Purchase History
+
+        </h2>
+
+
+        <p class="section-description">
+
+            All purchases created
+            with this supplier.
+
+        </p>
+
+    </div>
+
+
+
+    <a asp-controller="Purchases"
+       asp-action="Index"
+       asp-route-supplierId="@Model.Supplier.SupplierID"
+       class="btn btn-outline-success btn-sm">
+
+        View All Supplier Purchases
+
+    </a>
+
+
+</div>
+
+
+
+@if (Model.Supplier.Purchases.Count == 0)
+{
+
+    <div class="empty-state">
+
+        No purchase history
+        is available for this supplier.
+
+    </div>
+
+}
+else
+{
+
+    <div class="table-responsive custom-table">
+
+        <table class="table table-hover align-middle">
+
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Purchase #
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Line Items
+                    </th>
+
+                    <th>
+                        Total Amount
+                    </th>
+
+                    <th>
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+
+            <tbody>
+
+                @foreach (
+                    var purchase
+                    in Model.Supplier.Purchases
+                        .OrderByDescending(p => p.PurchaseDate)
+                )
+                {
+
+                    <tr>
+
+
+                        <!-- Purchase Number -->
+
+                        <td>
+
+                            <span class="purchase-number">
+
+                                #@purchase.PurchaseID
+
+                            </span>
+
+                        </td>
+
+
+
+                        <!-- Date -->
+
+                        <td>
+
+                            @(purchase.PurchaseDate.ToString("dd/MM/yyyy HH:mm"))
+
+                        </td>
+
+
+
+                        <!-- Line Items -->
+
+                        <td>
+
+                            <span class="quantity-badge">
+
+                                @purchase.PurchaseItems.Count Items
+
+                            </span>
+
+                        </td>
+
+
+
+                        <!-- Total Amount -->
+
+                        <td class="money-value">
+
+                            @(purchase.TotalAmount.ToString("N2"))
+                            EGP
+
+                        </td>
+
+
+
+                        <!-- Action -->
+
+                        <td>
+
+                            <a asp-controller="Purchases"
+                               asp-action="Details"
+                               asp-route-id="@purchase.PurchaseID"
+                               class="btn btn-primary btn-sm">
+
+                                View
+
+                            </a>
+
+                        </td>
+
+
+                    </tr>
+
+                }
+
+            </tbody>
+
+
+        </table>
+
+    </div>
+
+}

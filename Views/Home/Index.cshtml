@@ -1,0 +1,1055 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<style>
+
+    /* ==========================
+           HOME PAGE
+        ========================== */
+
+    .home-page {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+
+    /* ==========================
+           HERO
+        ========================== */
+
+    .hero-section {
+        position: relative;
+        overflow: hidden;
+        min-height: 470px;
+        border-radius: 24px;
+        padding: 65px 60px;
+        background: radial-gradient(circle at 85% 20%, rgba(255,255,255,.18), transparent 28%), linear-gradient(135deg, #0b5d3b 0%, #158451 48%, #1fa866 100%);
+        color: white;
+        box-shadow: 0 25px 60px rgba(17, 110, 70, .20);
+    }
+
+
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,.13);
+            right: -100px;
+            top: -130px;
+        }
+
+
+        .hero-section::after {
+            content: "";
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,.10);
+            right: 100px;
+            bottom: -150px;
+        }
+
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 650px;
+    }
+
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,.13);
+        border: 1px solid rgba(255,255,255,.22);
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 22px;
+        backdrop-filter: blur(10px);
+    }
+
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        background: #7dffba;
+        border-radius: 50%;
+        box-shadow: 0 0 0 5px rgba(125,255,186,.12);
+    }
+
+
+    .hero-title {
+        font-size: 48px;
+        line-height: 1.08;
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        margin-bottom: 18px;
+    }
+
+
+        .hero-title span {
+            color: #b9ffd8;
+        }
+
+
+    .hero-description {
+        max-width: 590px;
+        font-size: 17px;
+        line-height: 1.8;
+        color: rgba(255,255,255,.85);
+        margin-bottom: 30px;
+    }
+
+
+    .hero-buttons {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+
+    .hero-primary-btn {
+        text-decoration: none;
+        color: #116c45;
+        background: white;
+        padding: 13px 22px;
+        border-radius: 10px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        transition: all .25s ease;
+    }
+
+
+        .hero-primary-btn:hover {
+            color: #0b5637;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,.15);
+        }
+
+
+    .hero-secondary-btn {
+        text-decoration: none;
+        color: white;
+        border: 1px solid rgba(255,255,255,.40);
+        padding: 12px 22px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all .25s ease;
+    }
+
+
+        .hero-secondary-btn:hover {
+            color: white;
+            background: rgba(255,255,255,.10);
+        }
+
+
+
+    /* ==========================
+           HERO VISUAL
+        ========================== */
+
+    .hero-visual {
+        position: absolute;
+        right: 55px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 330px;
+        height: 330px;
+        z-index: 2;
+    }
+
+
+    .visual-main {
+        width: 230px;
+        height: 230px;
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        border-radius: 35px;
+        background: rgba(255,255,255,.12);
+        border: 1px solid rgba(255,255,255,.24);
+        backdrop-filter: blur(15px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 30px 50px rgba(0,0,0,.15);
+    }
+
+
+    .warehouse-icon {
+        width: 105px;
+        height: 105px;
+    }
+
+
+    .floating-card {
+        position: absolute;
+        background: rgba(255,255,255,.95);
+        color: #24342d;
+        padding: 11px 15px;
+        border-radius: 12px;
+        box-shadow: 0 12px 30px rgba(0,0,0,.15);
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+
+        .floating-card.one {
+            top: 25px;
+            right: 0;
+        }
+
+
+        .floating-card.two {
+            bottom: 20px;
+            left: 0;
+        }
+
+
+        .floating-card.three {
+            bottom: 55px;
+            right: -10px;
+        }
+
+
+    .floating-green {
+        color: #16945a;
+    }
+
+
+
+    /* ==========================
+           SECTION HEADER
+        ========================== */
+
+    .section-header {
+        margin-top: 55px;
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+
+    .section-small-title {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-weight: 700;
+        color: #198754;
+        margin-bottom: 7px;
+    }
+
+
+    .section-title {
+        font-size: 30px;
+        font-weight: 750;
+        color: #1f2d27;
+        margin: 0;
+    }
+
+
+    .section-description {
+        color: #84918b;
+        font-size: 14px;
+        margin-top: 7px;
+        margin-bottom: 0;
+    }
+
+
+
+    /* ==========================
+           MODULE CARDS
+        ========================== */
+
+    .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+
+    .module-card {
+        display: block;
+        position: relative;
+        text-decoration: none;
+        background: white;
+        border: 1px solid #e9eeeb;
+        border-radius: 18px;
+        padding: 24px;
+        min-height: 210px;
+        transition: all .25s ease;
+        overflow: hidden;
+    }
+
+
+        .module-card:hover {
+            transform: translateY(-6px);
+            border-color: #b8dfca;
+            box-shadow: 0 18px 40px rgba(30, 120, 75, .10);
+        }
+
+
+    .module-icon {
+        width: 48px;
+        height: 48px;
+        background: #e9f8f0;
+        color: #198754;
+        border-radius: 13px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 22px;
+    }
+
+
+        .module-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+
+    .module-title {
+        font-size: 19px;
+        font-weight: 700;
+        color: #24352d;
+        margin-bottom: 8px;
+    }
+
+
+    .module-description {
+        font-size: 13.5px;
+        color: #7c8983;
+        line-height: 1.6;
+        margin-bottom: 18px;
+    }
+
+
+    .module-link {
+        position: absolute;
+        bottom: 20px;
+        color: #198754;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+
+
+    /* ==========================
+           WORKFLOW
+        ========================== */
+
+    .workflow-wrapper {
+        margin-top: 55px;
+        border: 1px solid #e5ece8;
+        background: linear-gradient( 135deg, #ffffff, #f4faf7 );
+        border-radius: 22px;
+        padding: 35px;
+    }
+
+
+    .workflow {
+        display: grid;
+        grid-template-columns: 1fr 60px 1fr 60px 1fr 60px 1fr;
+        align-items: center;
+        margin-top: 30px;
+    }
+
+
+    .workflow-card {
+        background: white;
+        border: 1px solid #e7ece9;
+        border-radius: 14px;
+        padding: 20px;
+        text-align: center;
+        min-height: 135px;
+        box-shadow: 0 5px 18px rgba(0,0,0,.025);
+    }
+
+
+    .workflow-number {
+        width: 34px;
+        height: 34px;
+        margin: auto auto 12px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #198754;
+        color: white;
+        font-weight: 700;
+    }
+
+
+    .workflow-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #25372e;
+    }
+
+
+    .workflow-text {
+        font-size: 12px;
+        color: #87928d;
+        margin-top: 5px;
+    }
+
+
+    .workflow-arrow {
+        text-align: center;
+        font-size: 25px;
+        color: #90b6a1;
+    }
+
+
+
+    /* ==========================
+           BOTTOM BANNER
+        ========================== */
+
+    .bottom-banner {
+        margin-top: 40px;
+        border-radius: 20px;
+        padding: 27px 30px;
+        background: #152b21;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+
+
+    .bottom-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+
+    .bottom-description {
+        margin: 0;
+        font-size: 13px;
+        color: rgba(255,255,255,.66);
+    }
+
+
+    .bottom-button {
+        text-decoration: none;
+        padding: 11px 20px;
+        border-radius: 9px;
+        background: #26a269;
+        color: white;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: .2s;
+    }
+
+
+        .bottom-button:hover {
+            color: white;
+            background: #2db678;
+        }
+
+
+
+    /* ==========================
+           RESPONSIVE
+        ========================== */
+
+    @@media(max-width: 1100px) {
+
+        .hero-visual {
+            opacity: .30;
+            right: 10px;
+        }
+
+
+        .modules-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+
+        .workflow {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+
+        .workflow-arrow {
+            transform: rotate(90deg);
+        }
+    }
+
+
+    @@media(max-width: 650px) {
+
+        .hero-section {
+            padding: 45px 25px;
+        }
+
+
+        .hero-title {
+            font-size: 37px;
+        }
+
+
+        .hero-visual {
+            display: none;
+        }
+
+
+        .modules-grid {
+            grid-template-columns: 1fr;
+        }
+
+
+        .section-title {
+            font-size: 25px;
+        }
+
+
+        .bottom-banner {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+</style>
+
+
+
+<div class="home-page">
+
+
+    <!-- ==========================
+         HERO
+    =========================== -->
+
+    <section class="hero-section">
+
+
+        <div class="hero-content">
+
+            <div class="hero-badge">
+
+                <span class="status-dot"></span>
+
+                Inventory Management Platform
+
+            </div>
+
+
+            <h1 class="hero-title">
+
+                Smart Inventory.
+                <br />
+
+                <span>Simple Management.</span>
+
+            </h1>
+
+
+            <p class="hero-description">
+
+                Manage products, categories, suppliers and purchase
+                operations from one organized system designed to keep
+                your inventory accurate and your workflow efficient.
+
+            </p>
+
+
+            <div class="hero-buttons">
+
+                <a asp-controller="Products"
+                   asp-action="Index"
+                   class="hero-primary-btn">
+
+                    Explore Products
+
+                    <span>→</span>
+
+                </a>
+
+
+                <a asp-controller="Purchases"
+                   asp-action="Create"
+                   class="hero-secondary-btn">
+
+                    Create Purchase
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Visual -->
+
+        <div class="hero-visual">
+
+
+            <div class="visual-main">
+
+                <svg class="warehouse-icon"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="white"
+                     stroke-width="1.4">
+
+                    <path d="M3 10L12 4L21 10" />
+
+                    <path d="M5 9V20H19V9" />
+
+                    <path d="M9 20V14H15V20" />
+
+                    <path d="M8 11H10" />
+
+                    <path d="M14 11H16" />
+
+                </svg>
+
+            </div>
+
+
+            <div class="floating-card one">
+
+                Stock
+                <span class="floating-green">✓ Updated</span>
+
+            </div>
+
+
+            <div class="floating-card two">
+
+                Suppliers
+                <span class="floating-green">Connected</span>
+
+            </div>
+
+
+            <div class="floating-card three">
+
+                Purchase
+                <span class="floating-green">+ Stock</span>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+
+
+    <!-- ==========================
+         MODULES
+    =========================== -->
+
+    <div class="section-header">
+
+        <div>
+
+            <div class="section-small-title">
+                System Modules
+            </div>
+
+            <h2 class="section-title">
+                Everything in one place
+            </h2>
+
+            <p class="section-description">
+                Quick access to the core inventory management modules.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="modules-grid">
+
+
+        <!-- Categories -->
+
+        <a asp-controller="Categories"
+           asp-action="Index"
+           class="module-card">
+
+            <div class="module-icon">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+
+                    <rect x="3"
+                          y="3"
+                          width="7"
+                          height="7"
+                          rx="1" />
+
+                    <rect x="14"
+                          y="3"
+                          width="7"
+                          height="7"
+                          rx="1" />
+
+                    <rect x="3"
+                          y="14"
+                          width="7"
+                          height="7"
+                          rx="1" />
+
+                    <rect x="14"
+                          y="14"
+                          width="7"
+                          height="7"
+                          rx="1" />
+
+                </svg>
+
+            </div>
+
+
+            <div class="module-title">
+                Categories
+            </div>
+
+
+            <div class="module-description">
+
+                Organize inventory products into clear
+                and manageable categories.
+
+            </div>
+
+
+            <div class="module-link">
+                Open Categories →
+            </div>
+
+        </a>
+
+
+
+        <!-- Products -->
+
+        <a asp-controller="Products"
+           asp-action="Index"
+           class="module-card">
+
+            <div class="module-icon">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+
+                    <path d="M21 8L12 3L3 8L12 13L21 8Z" />
+
+                    <path d="M3 8V16L12 21L21 16V8" />
+
+                    <path d="M12 13V21" />
+
+                </svg>
+
+            </div>
+
+
+            <div class="module-title">
+                Products
+            </div>
+
+
+            <div class="module-description">
+
+                Manage product information, prices,
+                quantities and stock levels.
+
+            </div>
+
+
+            <div class="module-link">
+                Manage Products →
+            </div>
+
+        </a>
+
+
+
+        <!-- Suppliers -->
+
+        <a asp-controller="Suppliers"
+           asp-action="Index"
+           class="module-card">
+
+            <div class="module-icon">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+
+                    <path d="M16 21V19A4 4 0 0 0 12 15H6A4 4 0 0 0 2 19V21" />
+
+                    <circle cx="9"
+                            cy="7"
+                            r="4" />
+
+                    <path d="M22 21V19A4 4 0 0 0 19 15.13" />
+
+                    <path d="M16 3.13A4 4 0 0 1 16 10.87" />
+
+                </svg>
+
+            </div>
+
+
+            <div class="module-title">
+                Suppliers
+            </div>
+
+
+            <div class="module-description">
+
+                Maintain supplier records,
+                contact information and purchasing relationships.
+
+            </div>
+
+
+            <div class="module-link">
+                View Suppliers →
+            </div>
+
+        </a>
+
+
+
+        <!-- Purchases -->
+
+        <a asp-controller="Purchases"
+           asp-action="Index"
+           class="module-card">
+
+            <div class="module-icon">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2">
+
+                    <circle cx="9"
+                            cy="20"
+                            r="1" />
+
+                    <circle cx="19"
+                            cy="20"
+                            r="1" />
+
+                    <path d="M3 4H5L7.5 15H19L21 7H6" />
+
+                </svg>
+
+            </div>
+
+
+            <div class="module-title">
+                Purchases
+            </div>
+
+
+            <div class="module-description">
+
+                Create purchase orders, add multiple
+                products and automatically update stock.
+
+            </div>
+
+
+            <div class="module-link">
+                Purchase History →
+            </div>
+
+        </a>
+
+
+    </div>
+
+
+
+
+    <!-- ==========================
+         WORKFLOW
+    =========================== -->
+
+    <section class="workflow-wrapper">
+
+
+        <div class="section-small-title">
+            Inventory Workflow
+        </div>
+
+
+        <h2 class="section-title">
+            How the system works
+        </h2>
+
+
+        <p class="section-description">
+
+            A simple workflow keeps product inventory
+            organized and automatically updated.
+
+        </p>
+
+
+
+        <div class="workflow">
+
+
+            <div class="workflow-card">
+
+                <div class="workflow-number">
+                    1
+                </div>
+
+                <div class="workflow-title">
+                    Create Categories
+                </div>
+
+                <div class="workflow-text">
+                    Organize your inventory structure.
+                </div>
+
+            </div>
+
+
+            <div class="workflow-arrow">
+                →
+            </div>
+
+
+            <div class="workflow-card">
+
+                <div class="workflow-number">
+                    2
+                </div>
+
+                <div class="workflow-title">
+                    Add Products
+                </div>
+
+                <div class="workflow-text">
+                    Add products and initial stock.
+                </div>
+
+            </div>
+
+
+            <div class="workflow-arrow">
+                →
+            </div>
+
+
+            <div class="workflow-card">
+
+                <div class="workflow-number">
+                    3
+                </div>
+
+                <div class="workflow-title">
+                    Add Suppliers
+                </div>
+
+                <div class="workflow-text">
+                    Store supplier information.
+                </div>
+
+            </div>
+
+
+            <div class="workflow-arrow">
+                →
+            </div>
+
+
+            <div class="workflow-card">
+
+                <div class="workflow-number">
+                    4
+                </div>
+
+                <div class="workflow-title">
+                    Create Purchase
+                </div>
+
+                <div class="workflow-text">
+                    Stock increases automatically.
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+
+
+    <!-- ==========================
+         BOTTOM CTA
+    =========================== -->
+
+    <section class="bottom-banner">
+
+
+        <div>
+
+            <div class="bottom-title">
+
+                Ready to manage your inventory?
+
+            </div>
+
+
+            <p class="bottom-description">
+
+                Start a new purchase and keep your
+                product stock up to date.
+
+            </p>
+
+        </div>
+
+
+        <a asp-controller="Purchases"
+           asp-action="Create"
+           class="bottom-button">
+
+            + Create New Purchase
+
+        </a>
+
+
+    </section>
+
+
+</div>

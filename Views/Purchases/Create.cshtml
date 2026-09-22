@@ -1,0 +1,1291 @@
+@model InventorySystem.ViewModels.PurchaseCreateViewModel
+
+@{
+    ViewData["Title"] = "Create Purchase";
+
+    List<InventorySystem.Models.Supplier> suppliers =
+        ViewBag.Suppliers ?? new List<InventorySystem.Models.Supplier>();
+
+    List<InventorySystem.Models.Product> products =
+        ViewBag.Products ?? new List<InventorySystem.Models.Product>();
+}
+
+
+<style>
+
+    /* =========================
+           Header
+        ========================= */
+
+    .create-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .create-title {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 750;
+        color: #1f2937;
+    }
+
+    .create-subtitle {
+        margin: 5px 0 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+
+    /* =========================
+           Cards
+        ========================= */
+
+    .purchase-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .card-title-custom {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 18px;
+    }
+
+    .form-label {
+        font-size: 13px;
+        font-weight: 650;
+        color: #374151;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 9px;
+        border-color: #dce4df;
+        min-height: 42px;
+    }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #65b98a;
+            box-shadow: 0 0 0 .2rem rgba(25,135,84,.10);
+        }
+
+
+    /* =========================
+           Item Header
+        ========================= */
+
+    .items-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+    }
+
+    .items-heading {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .add-item-btn {
+        border-radius: 8px;
+        font-weight: 600;
+    }
+
+
+    /* =========================
+           Table
+        ========================= */
+
+    .purchase-table-wrapper {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .purchase-table {
+        margin-bottom: 0;
+    }
+
+        .purchase-table thead {
+            background: #f4f7f5;
+        }
+
+        .purchase-table th {
+            padding: 13px;
+            color: #374151;
+            font-size: 12px;
+            font-weight: 700;
+            border-bottom: 1px solid #dfe7e2;
+            white-space: nowrap;
+        }
+
+        .purchase-table td {
+            padding: 11px;
+            vertical-align: middle;
+        }
+
+    .current-stock {
+        font-weight: 700;
+        color: #198754;
+        text-align: center;
+    }
+
+    .line-total {
+        font-weight: 700;
+        color: #1f2937;
+        white-space: nowrap;
+    }
+
+    .remove-item-btn {
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 650;
+        white-space: nowrap;
+    }
+
+    .purchase-total-row {
+        background: #f8faf9;
+    }
+
+    #purchaseTotal {
+        color: #198754;
+        font-size: 17px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+
+    /* =========================
+           Bottom Actions
+        ========================= */
+
+    .purchase-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 22px;
+    }
+
+    .complete-btn {
+        background: #198754;
+        border-color: #198754;
+        padding: 11px 24px;
+        border-radius: 9px;
+        font-weight: 650;
+    }
+
+        .complete-btn:hover {
+            background: #146c43;
+            border-color: #146c43;
+        }
+
+    .cancel-btn {
+        padding: 11px 22px;
+        border-radius: 9px;
+        font-weight: 600;
+    }
+
+
+    /* =========================
+           Alerts
+        ========================= */
+
+    .custom-alert {
+        border: none;
+        border-radius: 11px;
+    }
+
+
+    @@media(max-width: 768px) {
+
+        .purchase-actions {
+            justify-content: stretch;
+        }
+
+            .purchase-actions .btn,
+            .purchase-actions a {
+                width: 100%;
+            }
+    }
+
+</style>
+
+
+
+<!-- =========================
+     Header
+========================= -->
+
+<div class="create-header">
+
+    <div>
+
+        <h1 class="create-title">
+            Create Purchase
+        </h1>
+
+        <p class="create-subtitle">
+            Select a supplier, add products and update inventory stock automatically.
+        </p>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     Missing Supplier
+========================= -->
+@if (suppliers.Count == 0)
+{
+    <div class="alert alert-warning custom-alert">
+
+        <strong>No suppliers available.</strong>
+
+        You need at least one supplier before creating a purchase.
+
+        <a asp-controller="Suppliers"
+           asp-action="Create">
+
+            Add a supplier
+
+        </a>.
+
+    </div>
+}
+
+
+
+<!-- =========================
+     Missing Products
+========================= -->
+@if (products.Count == 0)
+{
+    <div class="alert alert-warning custom-alert">
+
+        <strong>No products available.</strong>
+
+        You need at least one product before creating a purchase.
+
+    </div>
+}
+
+
+
+<form asp-action="Create"
+      method="post"
+      id="purchaseForm">
+
+
+    <!-- =========================
+         Validation
+    ========================= -->
+
+    <div asp-validation-summary="All"
+         class="text-danger mb-3">
+    </div>
+
+
+
+    <!-- =========================
+         Purchase Information
+    ========================= -->
+
+    <div class="purchase-card">
+
+        <div class="card-title-custom">
+            Purchase Information
+        </div>
+
+
+        <div class="row g-3">
+
+
+            <!-- Supplier -->
+
+            <div class="col-md-6">
+
+                <label asp-for="SupplierID"
+                       class="form-label">
+
+                    Supplier
+
+                </label>
+
+
+                <select asp-for="SupplierID"
+                        class="form-select">
+
+                    <option value="0">
+                        -- Select Supplier --
+                    </option>
+
+
+                    @foreach (var supplier in suppliers)
+                    {
+                        <option value="@supplier.SupplierID">
+
+                            @supplier.SupplierName
+
+                        </option>
+                    }
+
+                </select>
+
+
+                <span asp-validation-for="SupplierID"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+
+            <!-- Purchase Date -->
+
+            <div class="col-md-6">
+
+                <label asp-for="PurchaseDate"
+                       class="form-label">
+
+                    Purchase Date
+
+                </label>
+
+
+                <input asp-for="PurchaseDate"
+                       type="datetime-local"
+                       class="form-control"
+                       value="@Model.PurchaseDate.ToString("yyyy-MM-ddTHH:mm")" />
+
+
+                <span asp-validation-for="PurchaseDate"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+         Purchase Items
+    ========================= -->
+
+    <div class="purchase-card">
+
+        <div class="items-header">
+
+            <div>
+
+                <h3 class="items-heading">
+                    Purchase Items
+                </h3>
+
+                <small class="text-muted">
+                    Add one or more different products to this purchase.
+                </small>
+
+            </div>
+
+
+            <button type="button"
+                    class="btn btn-outline-success add-item-btn"
+                    id="addItemBtn"
+                @(products.Count == 0 ? "disabled" : null)>
+
+                + Add Product
+
+            </button>
+
+        </div>
+
+
+
+        <!-- Duplicate Product Alert -->
+
+        <div id="duplicateProductAlert"
+             class="alert alert-warning d-none custom-alert mb-3"
+             role="alert">
+
+            <strong>Duplicate Product!</strong>
+
+            This product is already added to the purchase.
+            Please increase its quantity instead.
+
+        </div>
+
+
+
+        <div class="table-responsive purchase-table-wrapper">
+
+            <table class="table purchase-table align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th style="width:31%;">
+                            Product
+                        </th>
+
+                        <th style="width:13%;">
+                            Current Stock
+                        </th>
+
+                        <th style="width:14%;">
+                            Quantity
+                        </th>
+
+                        <th style="width:16%;">
+                            Unit Cost
+                        </th>
+
+                        <th style="width:16%;">
+                            Line Total
+                        </th>
+
+                        <th style="width:10%;">
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+
+                <tbody id="itemsBody">
+
+                    @for (int i = 0; i < Model.Items.Count; i++)
+                    {
+                        <tr class="purchase-item-row">
+
+
+                            <!-- Product -->
+
+                            <td>
+
+                                <select name="Items[@i].ProductID"
+                                        class="form-select product-select">
+
+                                    <option value="0">
+                                        -- Select Product --
+                                    </option>
+
+
+                                    @foreach (var product in products)
+                                    {
+                                        if (Model.Items[i].ProductID == product.ProductID)
+                                        {
+                                            <option value="@product.ProductID"
+                                                    data-stock="@product.StockQuantity"
+                                                    selected>
+
+                                                @product.ProductName (@product.SKU)
+
+                                            </option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@product.ProductID"
+                                                    data-stock="@product.StockQuantity">
+
+                                                @product.ProductName (@product.SKU)
+
+                                            </option>
+                                        }
+                                    }
+
+                                </select>
+
+                            </td>
+
+
+
+                            <!-- Stock -->
+
+                            <td class="current-stock">
+                                -
+                            </td>
+
+
+
+                            <!-- Quantity -->
+
+                            <td>
+
+                                <input name="Items[@i].Quantity"
+                                       type="number"
+                                       min="1"
+                                       class="form-control quantity-input"
+                                       value="@Model.Items[i].Quantity" />
+
+                            </td>
+
+
+
+                            <!-- Unit Cost -->
+
+                            <td>
+
+                                <input name="Items[@i].UnitCost"
+                                       type="number"
+                                       min="0.01"
+                                       step="0.01"
+                                       class="form-control cost-input"
+                                       value="@Model.Items[i].UnitCost" />
+
+                            </td>
+
+
+
+                            <!-- Line Total -->
+
+                            <td class="line-total">
+                                0.00 EGP
+                            </td>
+
+
+
+                            <!-- Remove -->
+
+                            <td>
+
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm remove-item-btn"
+                                        title="Remove this product">
+
+                                    Remove
+
+                                </button>
+
+                            </td>
+
+
+                        </tr>
+                    }
+
+                </tbody>
+
+
+
+                <tfoot>
+
+                    <tr class="purchase-total-row">
+
+                        <th colspan="4"
+                            class="text-end">
+
+                            Purchase Total
+
+                        </th>
+
+
+                        <th id="purchaseTotal">
+
+                            0.00 EGP
+
+                        </th>
+
+
+                        <th>
+                        </th>
+
+                    </tr>
+
+                </tfoot>
+
+            </table>
+
+        </div>
+
+
+
+        <!-- =========================
+             Buttons
+        ========================= -->
+
+        <div class="purchase-actions">
+
+
+            <a asp-action="Index"
+               class="btn btn-outline-secondary cancel-btn"
+               id="cancelPurchaseBtn">
+
+                Cancel
+
+            </a>
+
+
+            <button type="submit"
+                    class="btn btn-success complete-btn"
+                    id="completePurchaseBtn"
+                @(suppliers.Count == 0 || products.Count == 0 ? "disabled" : null)>
+
+                Complete Purchase
+
+            </button>
+
+
+        </div>
+
+    </div>
+
+</form>
+
+
+
+<!-- =========================================================
+     ADD PRODUCT TEMPLATE
+========================================================= -->
+
+<template id="itemRowTemplate">
+
+    <tr class="purchase-item-row">
+
+
+        <td>
+
+            <select name="Items[__index__].ProductID"
+                    class="form-select product-select">
+
+                <option value="0">
+                    -- Select Product --
+                </option>
+
+
+                @foreach (var product in products)
+                {
+                    <option value="@product.ProductID"
+                            data-stock="@product.StockQuantity">
+
+                        @product.ProductName (@product.SKU)
+
+                    </option>
+                }
+
+            </select>
+
+        </td>
+
+
+        <td class="current-stock">
+            -
+        </td>
+
+
+        <td>
+
+            <input name="Items[__index__].Quantity"
+                   type="number"
+                   min="1"
+                   class="form-control quantity-input"
+                   value="1" />
+
+        </td>
+
+
+        <td>
+
+            <input name="Items[__index__].UnitCost"
+                   type="number"
+                   min="0.01"
+                   step="0.01"
+                   class="form-control cost-input"
+                   value="0" />
+
+        </td>
+
+
+        <td class="line-total">
+            0.00 EGP
+        </td>
+
+
+        <td>
+
+            <button type="button"
+                    class="btn btn-outline-danger btn-sm remove-item-btn"
+                    title="Remove this product">
+
+                Remove
+
+            </button>
+
+        </td>
+
+
+    </tr>
+
+</template>
+
+
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        const itemsBody =
+            document.getElementById('itemsBody');
+
+        const addItemBtn =
+            document.getElementById('addItemBtn');
+
+        const itemRowTemplate =
+            document.getElementById('itemRowTemplate');
+
+        const purchaseTotal =
+            document.getElementById('purchaseTotal');
+
+        const duplicateProductAlert =
+            document.getElementById('duplicateProductAlert');
+
+        const purchaseForm =
+            document.getElementById('purchaseForm');
+
+        const cancelPurchaseBtn =
+            document.getElementById('cancelPurchaseBtn');
+
+
+        let formChanged = false;
+        let formSubmitting = false;
+
+
+
+        // =====================================================
+        // Reindex
+        // =====================================================
+
+        function reindexRows() {
+
+            const rows =
+                itemsBody.querySelectorAll('.purchase-item-row');
+
+
+            rows.forEach((row, index) => {
+
+                row.querySelector('.product-select').name =
+                    `Items[${index}].ProductID`;
+
+                row.querySelector('.quantity-input').name =
+                    `Items[${index}].Quantity`;
+
+                row.querySelector('.cost-input').name =
+                    `Items[${index}].UnitCost`;
+
+            });
+
+        }
+
+
+
+        // =====================================================
+        // Update Row
+        // =====================================================
+
+        function updateRow(row) {
+
+            const productSelect =
+                row.querySelector('.product-select');
+
+            const quantityInput =
+                row.querySelector('.quantity-input');
+
+            const costInput =
+                row.querySelector('.cost-input');
+
+            const stockCell =
+                row.querySelector('.current-stock');
+
+            const lineTotalCell =
+                row.querySelector('.line-total');
+
+
+            const selectedOption =
+                productSelect.options[
+                productSelect.selectedIndex
+                ];
+
+
+            const stock =
+                selectedOption?.dataset?.stock;
+
+
+            if (
+                productSelect.value === "0"
+                ||
+                productSelect.value === ""
+            ) {
+                stockCell.textContent = "-";
+            }
+            else {
+                stockCell.textContent = stock ?? "-";
+            }
+
+
+            const quantity =
+                parseFloat(quantityInput.value) || 0;
+
+            const unitCost =
+                parseFloat(costInput.value) || 0;
+
+            const lineTotal =
+                quantity * unitCost;
+
+
+            lineTotalCell.textContent =
+                `${lineTotal.toFixed(2)} EGP`;
+
+        }
+
+
+
+        // =====================================================
+        // Total
+        // =====================================================
+
+        function updatePurchaseTotal() {
+
+            let total = 0;
+
+
+            itemsBody
+                .querySelectorAll('.purchase-item-row')
+                .forEach(row => {
+
+                    updateRow(row);
+
+
+                    const quantity =
+                        parseFloat(
+                            row.querySelector('.quantity-input').value
+                        ) || 0;
+
+
+                    const unitCost =
+                        parseFloat(
+                            row.querySelector('.cost-input').value
+                        ) || 0;
+
+
+                    total += quantity * unitCost;
+
+                });
+
+
+            purchaseTotal.textContent =
+                `${total.toFixed(2)} EGP`;
+
+        }
+
+
+
+        // =====================================================
+        // Duplicate Alert
+        // =====================================================
+
+        function hideDuplicateAlert() {
+
+            duplicateProductAlert
+                .classList
+                .add('d-none');
+
+        }
+
+
+        function showDuplicateAlert() {
+
+            duplicateProductAlert
+                .classList
+                .remove('d-none');
+
+        }
+
+
+
+        // =====================================================
+        // Duplicate Check
+        // =====================================================
+
+        function checkDuplicateProduct(currentSelect) {
+
+            const selectedProductId =
+                currentSelect.value;
+
+
+            if (
+                selectedProductId === "0"
+                ||
+                selectedProductId === ""
+            ) {
+
+                hideDuplicateAlert();
+
+                return false;
+            }
+
+
+            const allProductSelects =
+                itemsBody.querySelectorAll('.product-select');
+
+
+            let duplicateFound = false;
+
+
+            allProductSelects.forEach(select => {
+
+                if (
+                    select !== currentSelect
+                    &&
+                    select.value === selectedProductId
+                ) {
+
+                    duplicateFound = true;
+
+                }
+
+            });
+
+
+            if (duplicateFound) {
+
+                showDuplicateAlert();
+
+                currentSelect.value = "0";
+
+
+                const currentRow =
+                    currentSelect.closest('.purchase-item-row');
+
+
+                currentRow
+                    .querySelector('.current-stock')
+                    .textContent = "-";
+
+
+                updatePurchaseTotal();
+
+                return true;
+
+            }
+
+
+            hideDuplicateAlert();
+
+            return false;
+
+        }
+
+
+
+        // =====================================================
+        // Add Product
+        // =====================================================
+
+        addItemBtn?.addEventListener(
+            'click',
+            function() {
+
+                const index =
+                    itemsBody
+                        .querySelectorAll('.purchase-item-row')
+                        .length;
+
+
+                const html =
+                    itemRowTemplate
+                        .innerHTML
+                        .replaceAll('__index__', index);
+
+
+                itemsBody.insertAdjacentHTML(
+                    'beforeend',
+                    html
+                );
+
+
+                formChanged = true;
+
+                hideDuplicateAlert();
+
+                updatePurchaseTotal();
+
+            }
+        );
+
+
+
+        // =====================================================
+        // Input Change
+        // =====================================================
+
+        purchaseForm.addEventListener(
+            'input',
+            function() {
+
+                formChanged = true;
+
+            }
+        );
+
+
+        purchaseForm.addEventListener(
+            'change',
+            function() {
+
+                formChanged = true;
+
+            }
+        );
+
+
+
+        itemsBody.addEventListener(
+            'input',
+            function(event) {
+
+                if (
+                    event.target.classList.contains('quantity-input')
+                    ||
+                    event.target.classList.contains('cost-input')
+                ) {
+
+                    updatePurchaseTotal();
+
+                }
+
+            }
+        );
+
+
+
+        // =====================================================
+        // Product Change
+        // =====================================================
+
+        itemsBody.addEventListener(
+            'change',
+            function(event) {
+
+                if (
+                    event.target.classList.contains('product-select')
+                ) {
+
+                    const duplicateFound =
+                        checkDuplicateProduct(event.target);
+
+
+                    if (!duplicateFound) {
+
+                        updatePurchaseTotal();
+
+                    }
+
+                }
+
+            }
+        );
+
+
+
+        // =====================================================
+        // Remove Product
+        // =====================================================
+
+        itemsBody.addEventListener(
+            'click',
+            function(event) {
+
+                if (
+                    !event.target
+                        .classList
+                        .contains('remove-item-btn')
+                ) {
+                    return;
+                }
+
+
+                const rows =
+                    itemsBody
+                        .querySelectorAll('.purchase-item-row');
+
+
+                if (rows.length === 1) {
+
+                    alert(
+                        'A purchase must contain at least one product.'
+                    );
+
+                    return;
+
+                }
+
+
+                event.target
+                    .closest('.purchase-item-row')
+                    .remove();
+
+
+                formChanged = true;
+
+                reindexRows();
+
+                hideDuplicateAlert();
+
+                updatePurchaseTotal();
+
+            }
+        );
+
+
+
+        // =====================================================
+        // Submit Protection
+        // =====================================================
+
+        purchaseForm.addEventListener(
+            'submit',
+            function(event) {
+
+                const selectedProducts = [];
+
+                let duplicateFound = false;
+
+
+                itemsBody
+                    .querySelectorAll('.product-select')
+                    .forEach(select => {
+
+                        const productId =
+                            select.value;
+
+
+                        if (
+                            productId === "0"
+                            ||
+                            productId === ""
+                        ) {
+                            return;
+                        }
+
+
+                        if (
+                            selectedProducts.includes(productId)
+                        ) {
+
+                            duplicateFound = true;
+
+                        }
+                        else {
+
+                            selectedProducts.push(productId);
+
+                        }
+
+                    });
+
+
+                if (duplicateFound) {
+
+                    event.preventDefault();
+
+                    showDuplicateAlert();
+
+                    duplicateProductAlert.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+
+                    return;
+                }
+
+
+                formSubmitting = true;
+
+            }
+        );
+
+
+
+        // =====================================================
+        // Cancel Confirmation
+        // =====================================================
+
+        cancelPurchaseBtn.addEventListener(
+            'click',
+            function(event) {
+
+                if (!formChanged)
+                    return;
+
+
+                const shouldLeave =
+                    confirm(
+                        'You have unsaved purchase data. Are you sure you want to leave this page?'
+                    );
+
+
+                if (!shouldLeave) {
+
+                    event.preventDefault();
+
+                }
+
+            }
+        );
+
+
+
+        // =====================================================
+        // Browser Leave Warning
+        // =====================================================
+
+        window.addEventListener(
+            'beforeunload',
+            function(event) {
+
+                if (
+                    formChanged
+                    &&
+                    !formSubmitting
+                ) {
+
+                    event.preventDefault();
+
+                    event.returnValue = '';
+
+                }
+
+            }
+        );
+
+
+
+        // Initial Calculation
+        updatePurchaseTotal();
+
+    </script>
+}

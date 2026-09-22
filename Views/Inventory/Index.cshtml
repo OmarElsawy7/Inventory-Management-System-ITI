@@ -1,0 +1,60 @@
+@model IEnumerable<InventorySystem.Models.Product>
+@{
+    ViewData["Title"] = "Inventory";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Inventory Status</h2>
+    <a asp-action="Index" asp-route-lowStock="true" class="btn btn-warning">Low Stock Only</a>
+</div>
+
+<form class="row g-2 mb-3">
+    <div class="col">
+        <input name="search" value="@ViewBag.Search" class="form-control" placeholder="Search product or SKU" />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary">Search</button>
+    </div>
+    <div class="col-auto">
+        <a asp-action="Index" class="btn btn-outline-secondary">Reset</a>
+    </div>
+</form>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Stock Quantity</th>
+            <th>Low-Stock Threshold</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            var low = p.StockQuantity <= p.LowStockThreshold;
+            var outOfStock = p.StockQuantity == 0;
+            <tr>
+                <td>@p.ProductName</td>
+                <td>@p.SKU</td>
+                <td>@p.StockQuantity</td>
+                <td>@p.LowStockThreshold</td>
+                <td>
+                    @if (outOfStock)
+                    {
+                        <span class="badge text-bg-danger">Out of Stock</span>
+                    }
+                    else if (low)
+                    {
+                        <span class="badge text-bg-warning">Low Stock</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-success">In Stock</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

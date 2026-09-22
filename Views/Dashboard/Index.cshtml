@@ -1,0 +1,236 @@
+﻿@model InventorySystem.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard & Analytics";
+}
+
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">Dashboard & Analytics</h2>
+
+    <!-- KPI Cards Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Products</h5>
+                    <h3>@Model.TotalProducts</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Total Sales Revenue</h5>
+                    <h3>@Model.TotalSalesRevenue.ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Total Purchases Value</h5>
+                    <h3>@Model.TotalPurchasesValue.ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Low Stock Items</h5>
+                    <h3>@Model.LowStockProductsCount</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="text-muted">Categories</h6>
+                    <h4>@Model.TotalCategories</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="text-muted">Suppliers</h6>
+                    <h4>@Model.TotalSuppliers</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Stock Qty</h6>
+                    <h4>@Model.TotalStockQuantity</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="text-muted">Sales / Purchases Count</h6>
+                    <h4>@Model.TotalSalesCount / @Model.TotalPurchasesCount</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Inventory Assistant Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-primary shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h5 class="card-title mb-2">
+                                <span style="font-size: 1.5rem; margin-right: 10px;">🤖</span>
+                                AI Inventory Assistant
+                            </h5>
+                            <p class="card-text text-muted mb-0">
+                                Ask intelligent questions about your inventory, sales, purchases, products, suppliers and stock.
+                            </p>
+                        </div>
+                        <a href="@Url.Action("Index", "AIAssistant")" class="btn btn-primary btn-lg">
+                            Open AI Assistant
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Most Sold Products Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Top 5 Most Sold Products</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.MostSoldProducts != null && Model.MostSoldProducts.Any())
+            {
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Total Quantity Sold</th>
+                            <th>Total Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.MostSoldProducts)
+                        {
+                            <tr>
+                                <td>@item.ProductName</td>
+                                <td>@item.TotalQuantitySold</td>
+                                <td>@item.TotalRevenue.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-muted mb-0">No sales data available yet.</p>
+            }
+        </div>
+    </div>
+
+    <!-- Low Stock Alert Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Low Stock Products Warning</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.LowStockProducts != null && Model.LowStockProducts.Any())
+            {
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Current Stock</th>
+                            <th>Threshold</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.LowStockProducts)
+                        {
+                            <tr>
+                                <td>@item.ProductName</td>
+                                <td>@item.StockQuantity</td>
+                                <td>@item.LowStockThreshold</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-success mb-0">All products have sufficient stock levels.</p>
+            }
+        </div>
+    </div>
+
+    <!-- Recent Sales & Purchases -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Recent Sales</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var sale in Model.RecentSales)
+                            {
+                                <tr>
+                                    <td>@sale.SaleID</td>
+                                    <td>@sale.SaleDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@sale.TotalAmount.ToString("C")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Recent Purchases</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Supplier</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var purchase in Model.RecentPurchases)
+                            {
+                                <tr>
+                                    <td>@purchase.PurchaseID</td>
+                                    <td>@purchase.Supplier?.SupplierName</td>
+                                    <td>@purchase.PurchaseDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@purchase.TotalAmount.ToString("C")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

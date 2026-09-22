@@ -1,0 +1,648 @@
+@model List<InventorySystem.Models.Purchase>
+
+@{
+    ViewData["Title"] = "Purchase History";
+
+    List<InventorySystem.Models.Supplier> suppliers =
+        ViewBag.Suppliers ?? new List<InventorySystem.Models.Supplier>();
+
+    string search = ViewBag.Search as string ?? "";
+
+    int? selectedSupplierId = ViewBag.SupplierId;
+
+    DateTime? fromDate = ViewBag.FromDate;
+    DateTime? toDate = ViewBag.ToDate;
+
+    bool hasFilters =
+        !string.IsNullOrWhiteSpace(search)
+        || selectedSupplierId.HasValue
+        || fromDate.HasValue
+        || toDate.HasValue;
+}
+
+
+<style>
+
+    /* =========================
+           Header
+        ========================= */
+
+    .purchase-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .purchase-title {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 750;
+        color: #1f2937;
+    }
+
+    .purchase-subtitle {
+        margin-top: 5px;
+        margin-bottom: 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .result-count {
+        display: inline-flex;
+        align-items: center;
+        margin-top: 10px;
+        padding: 5px 11px;
+        border-radius: 50px;
+        background: #eef8f2;
+        color: #198754;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .create-purchase-btn {
+        background: #198754;
+        color: white;
+        text-decoration: none;
+        padding: 11px 20px;
+        border-radius: 9px;
+        font-weight: 600;
+        transition: .2s;
+        box-shadow: 0 5px 15px rgba(25,135,84,.12);
+    }
+
+        .create-purchase-btn:hover {
+            background: #146c43;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+
+    /* =========================
+           Alerts
+        ========================= */
+
+    .custom-alert {
+        border: none;
+        border-radius: 11px;
+        padding: 14px 16px;
+        margin-bottom: 20px;
+    }
+
+
+    /* =========================
+           Filter Card
+        ========================= */
+
+    .filter-card {
+        background: #f8faf9;
+        border: 1px solid #e4ebe7;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .filter-title {
+        font-size: 14px;
+        color: #1f2937;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .filter-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+
+    .filter-card .form-control,
+    .filter-card .form-select {
+        border-radius: 8px;
+        border-color: #dce4df;
+    }
+
+        .filter-card .form-control:focus,
+        .filter-card .form-select:focus {
+            border-color: #65b98a;
+            box-shadow: 0 0 0 .2rem rgba(25,135,84,.10);
+        }
+
+    .filter-btn {
+        background: #198754;
+        border: none;
+        color: white;
+        border-radius: 8px;
+        height: 38px;
+        padding: 0 22px;
+        font-weight: 600;
+    }
+
+        .filter-btn:hover {
+            background: #146c43;
+        }
+
+    .reset-btn {
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        padding: 0 20px;
+    }
+
+
+    /* =========================
+           History Table
+        ========================= */
+
+    .history-table {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        background: white;
+    }
+
+        .history-table thead {
+            background: #f3f6f4;
+        }
+
+        .history-table th {
+            padding: 14px;
+            font-size: 13px;
+            color: #374151;
+            border-bottom: 1px solid #dde5e0;
+            white-space: nowrap;
+        }
+
+        .history-table td {
+            padding: 14px;
+            vertical-align: middle;
+            color: #4b5563;
+        }
+
+        .history-table tbody tr {
+            transition: background-color .2s ease;
+        }
+
+            .history-table tbody tr:hover {
+                background: #fbfdfc;
+            }
+
+    .purchase-number {
+        font-weight: 750;
+        color: #198754;
+    }
+
+    .supplier-name {
+        color: #1f2937;
+        font-weight: 600;
+    }
+
+    .line-badge {
+        display: inline-block;
+        background: #e9f7ef;
+        color: #198754;
+        border-radius: 50px;
+        padding: 5px 11px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .amount {
+        font-weight: 700;
+        color: #1f2937;
+        white-space: nowrap;
+    }
+
+    .details-btn {
+        background: #eef4ff;
+        color: #2563eb;
+        border: none;
+        text-decoration: none;
+        padding: 7px 13px;
+        border-radius: 7px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: .2s;
+        white-space: nowrap;
+    }
+
+        .details-btn:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+
+    /* =========================
+           Empty State
+        ========================= */
+
+    .empty-state {
+        border: 1px dashed #cbd5cf;
+        border-radius: 16px;
+        padding: 50px 20px;
+        text-align: center;
+        background: #fafcfb;
+    }
+
+    .empty-icon {
+        width: 55px;
+        height: 55px;
+        margin: 0 auto 15px;
+        border-radius: 15px;
+        background: #e9f7ef;
+        color: #198754;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 800;
+        font-size: 20px;
+    }
+
+    .empty-state h4 {
+        color: #374151;
+        font-weight: 700;
+    }
+
+    .empty-state p {
+        color: #7b8781;
+        margin-bottom: 18px;
+    }
+
+</style>
+
+
+
+<!-- =========================
+     Header
+========================= -->
+
+<div class="purchase-header">
+
+    <div>
+
+        <h1 class="purchase-title">
+            Purchase History
+        </h1>
+
+        <p class="purchase-subtitle">
+            Search, filter and review all purchase transactions.
+        </p>
+
+        <div class="result-count">
+            Showing @Model.Count purchase transaction(s)
+        </div>
+
+    </div>
+
+
+    <a asp-action="Create"
+       class="create-purchase-btn">
+
+        + Create Purchase
+
+    </a>
+
+</div>
+
+
+
+<!-- =========================
+     Success Message
+========================= -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show custom-alert"
+         role="alert">
+
+        <strong>Success!</strong>
+        @TempData["Success"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close">
+        </button>
+
+    </div>
+}
+
+
+
+<!-- =========================
+     Search & Filter
+========================= -->
+
+<div class="filter-card">
+
+    <div class="filter-title">
+        Search & Filter Purchases
+    </div>
+
+
+    <form asp-action="Index"
+          method="get">
+
+        <div class="row g-3 align-items-end">
+
+
+            <!-- Search -->
+
+            <div class="col-lg-3 col-md-6">
+
+                <label class="filter-label">
+                    Search
+                </label>
+
+                <input type="text"
+                       name="search"
+                       value="@search"
+                       class="form-control"
+                       placeholder="Purchase # or supplier..." />
+
+            </div>
+
+
+
+            <!-- Supplier -->
+
+            <div class="col-lg-3 col-md-6">
+
+                <label class="filter-label">
+                    Supplier
+                </label>
+
+                <select name="supplierId"
+                        class="form-select">
+
+                    <option value="">
+                        All Suppliers
+                    </option>
+
+                    @foreach (var supplier in suppliers)
+                    {
+                        if (selectedSupplierId == supplier.SupplierID)
+                        {
+                            <option value="@supplier.SupplierID"
+                                    selected>
+
+                                @supplier.SupplierName
+
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@supplier.SupplierID">
+
+                                @supplier.SupplierName
+
+                            </option>
+                        }
+                    }
+
+                </select>
+
+            </div>
+
+
+
+            <!-- From Date -->
+
+            <div class="col-lg-2 col-md-6">
+
+                <label class="filter-label">
+                    From Date
+                </label>
+
+                <input type="date"
+                       name="fromDate"
+                       class="form-control"
+                       value="@(fromDate?.ToString("yyyy-MM-dd"))" />
+
+            </div>
+
+
+
+            <!-- To Date -->
+
+            <div class="col-lg-2 col-md-6">
+
+                <label class="filter-label">
+                    To Date
+                </label>
+
+                <input type="date"
+                       name="toDate"
+                       class="form-control"
+                       value="@(toDate?.ToString("yyyy-MM-dd"))" />
+
+            </div>
+
+
+
+            <!-- Buttons -->
+
+            <div class="col-lg-2 col-md-12">
+
+                <div class="d-flex gap-2">
+
+                    <button type="submit"
+                            class="filter-btn flex-grow-1">
+
+                        Filter
+
+                    </button>
+
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary reset-btn">
+
+                        Reset
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </form>
+
+</div>
+
+
+
+<!-- =========================
+     History
+========================= -->
+@if (Model.Count == 0)
+{
+    <div class="empty-state">
+
+        <div class="empty-icon">
+            P
+        </div>
+
+
+        @if (hasFilters)
+        {
+            <h4>
+                No matching purchases
+            </h4>
+
+            <p>
+                No purchase transactions match the selected filters.
+            </p>
+
+            <a asp-action="Index"
+               class="btn btn-outline-success">
+
+                Clear Filters
+
+            </a>
+        }
+        else
+        {
+            <h4>
+                No purchases yet
+            </h4>
+
+            <p>
+                Create your first purchase transaction to start tracking stock.
+            </p>
+
+            <a asp-action="Create"
+               class="btn btn-success">
+
+                + Create First Purchase
+
+            </a>
+        }
+
+    </div>
+}
+else
+{
+    <div class="table-responsive history-table">
+
+        <table class="table table-hover mb-0 align-middle">
+
+            <thead>
+
+                <tr>
+
+                    <th>Purchase #</th>
+
+                    <th>Supplier</th>
+
+                    <th>Date</th>
+
+                    <th>Line Items</th>
+
+                    <th>Total Amount</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                @foreach (var purchase in Model)
+                {
+                    <tr>
+
+
+                        <!-- Purchase Number -->
+
+                        <td>
+
+                            <span class="purchase-number">
+
+                                #@purchase.PurchaseID
+
+                            </span>
+
+                        </td>
+
+
+
+                        <!-- Supplier -->
+
+                        <td>
+
+                            <span class="supplier-name">
+
+                                @(purchase.Supplier?.SupplierName ?? "Unknown Supplier")
+
+                            </span>
+
+                        </td>
+
+
+
+                        <!-- Date -->
+
+                        <td>
+
+                            @(purchase.PurchaseDate.ToString("dd/MM/yyyy HH:mm"))
+
+                        </td>
+
+
+
+                        <!-- Line Items -->
+
+                        <td>
+
+                            <span class="line-badge">
+
+                                @purchase.PurchaseItems.Count Items
+
+                            </span>
+
+                        </td>
+
+
+
+                        <!-- Total -->
+
+                        <td class="amount">
+
+                            @(purchase.TotalAmount.ToString("N2")) EGP
+
+                        </td>
+
+
+
+                        <!-- Details -->
+
+                        <td>
+
+                            <a asp-action="Details"
+                               asp-route-id="@purchase.PurchaseID"
+                               class="details-btn">
+
+                                View Details
+
+                            </a>
+
+                        </td>
+
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+}

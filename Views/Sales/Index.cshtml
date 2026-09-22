@@ -1,0 +1,41 @@
+@model IEnumerable<InventorySystem.Models.Sale>
+@{
+    ViewData["Title"] = "Sales History";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Sales History</h2>
+    <a asp-action="Create" class="btn btn-success">+ New Sale</a>
+</div>
+
+<form class="mb-3">
+    <input name="search" value="@ViewBag.Search" class="form-control" placeholder="Search by sale number, customer or phone" />
+</form>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>#@s.SaleID</td>
+                <td>@s.CustomerInfo</td>
+                <td>@s.SaleDate.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@s.SaleItems.Count</td>
+                <td>@s.TotalAmount.ToString("C")</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@s.SaleID" class="btn btn-sm btn-outline-primary">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

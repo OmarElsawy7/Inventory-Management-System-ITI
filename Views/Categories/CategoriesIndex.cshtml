@@ -1,0 +1,757 @@
+﻿@model List<InventorySystem.Models.Category>
+
+@{
+    ViewData["Title"] = "Categories";
+
+    string search =
+        ViewBag.Search as string ?? "";
+
+    bool hasSearch =
+        !string.IsNullOrWhiteSpace(search);
+}
+
+
+<style>
+
+    /* =========================
+           Header
+        ========================= */
+
+    .categories-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .categories-title {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 750;
+        color: #1f2937;
+    }
+
+    .categories-subtitle {
+        margin: 5px 0 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .category-count {
+        display: inline-flex;
+        margin-top: 9px;
+        padding: 5px 11px;
+        border-radius: 50px;
+        background: #e9f7ef;
+        color: #198754;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .add-category-btn {
+        background: #198754;
+        color: white;
+        text-decoration: none;
+        padding: 11px 20px;
+        border-radius: 9px;
+        font-weight: 650;
+        transition: .2s;
+        box-shadow: 0 5px 15px rgba(25,135,84,.12);
+    }
+
+        .add-category-btn:hover {
+            background: #146c43;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+
+    /* =========================
+           Search
+        ========================= */
+
+    .search-card {
+        background: #f8faf9;
+        border: 1px solid #e4ebe7;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .search-label {
+        font-size: 13px;
+        font-weight: 650;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+
+    .search-card .form-control {
+        border-radius: 8px;
+        border-color: #dce4df;
+    }
+
+        .search-card .form-control:focus {
+            border-color: #65b98a;
+            box-shadow: 0 0 0 .2rem rgba(25,135,84,.10);
+        }
+
+
+    /* =========================
+           Table
+        ========================= */
+
+    .categories-table-wrapper {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        background: white;
+    }
+
+    .categories-table {
+        margin-bottom: 0;
+    }
+
+        .categories-table thead {
+            background: #f4f7f5;
+        }
+
+        .categories-table th {
+            padding: 14px;
+            color: #374151;
+            font-size: 12px;
+            font-weight: 700;
+            border-bottom: 1px solid #dfe7e2;
+        }
+
+        .categories-table td {
+            padding: 14px;
+            vertical-align: middle;
+            color: #4b5563;
+        }
+
+        .categories-table tbody tr:hover {
+            background: #fbfdfc;
+        }
+
+
+    /* =========================
+           Category Identity
+        ========================= */
+
+    .category-main {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .category-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #e9f7ef;
+        color: #198754;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    .category-name {
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .description-text {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .products-badge {
+        display: inline-block;
+        background: #eef4ff;
+        color: #2563eb;
+        border-radius: 50px;
+        padding: 5px 11px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+
+    /* =========================
+           Actions
+        ========================= */
+
+    .action-group {
+        display: flex;
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+
+    .action-btn {
+        text-decoration: none;
+        border: none;
+        border-radius: 7px;
+        padding: 7px 11px;
+        font-size: 12px;
+        font-weight: 650;
+        transition: .2s;
+        white-space: nowrap;
+    }
+
+    .details-btn {
+        background: #eef4ff;
+        color: #2563eb;
+    }
+
+        .details-btn:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+    .edit-btn {
+        background: #fff7df;
+        color: #b7791f;
+    }
+
+        .edit-btn:hover {
+            background: #d69e2e;
+            color: white;
+        }
+
+    .delete-btn {
+        background: #fff0f0;
+        color: #dc3545;
+    }
+
+        .delete-btn:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+
+    /* =========================
+           Alerts
+        ========================= */
+
+    .custom-alert {
+        border: none;
+        border-radius: 11px;
+    }
+
+
+    /* =========================
+           Empty
+        ========================= */
+
+    .empty-state {
+        border: 1px dashed #cbd5cf;
+        background: #fafcfb;
+        border-radius: 16px;
+        padding: 50px 25px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 55px;
+        height: 55px;
+        margin: 0 auto 15px;
+        border-radius: 15px;
+        background: #e9f7ef;
+        color: #198754;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 800;
+        font-size: 21px;
+    }
+
+    .empty-state h4 {
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .empty-state p {
+        color: #7b8781;
+    }
+
+
+    /* =========================
+           Delete Modal
+        ========================= */
+
+    .delete-modal-icon {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        margin: 0 auto 15px;
+        background: #fff0f0;
+        color: #dc3545;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 25px;
+        font-weight: 800;
+    }
+
+    .modal-content {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0,0,0,.15);
+    }
+
+</style>
+
+
+
+<!-- =========================
+     Header
+========================= -->
+
+<div class="categories-header">
+
+    <div>
+
+        <h1 class="categories-title">
+            Categories
+        </h1>
+
+        <p class="categories-subtitle">
+            Organize products into clear inventory categories.
+        </p>
+
+        <div class="category-count">
+            @Model.Count Category(s) Found
+        </div>
+
+    </div>
+
+
+    <a asp-action="Create"
+       class="add-category-btn">
+
+        + Add New Category
+
+    </a>
+
+</div>
+
+
+
+<!-- =========================
+     Success
+========================= -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show custom-alert">
+
+        <strong>Success!</strong>
+        @TempData["Success"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
+
+
+
+<!-- =========================
+     Error
+========================= -->
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show custom-alert">
+
+        <strong>Unable to complete action.</strong>
+        @TempData["Error"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
+
+
+
+<!-- =========================
+     Search
+========================= -->
+
+<div class="search-card">
+
+    <form asp-action="Index"
+          method="get">
+
+        <div class="row g-3 align-items-end">
+
+            <div class="col-md-9">
+
+                <label class="search-label">
+                    Search Categories
+                </label>
+
+                <input type="text"
+                       name="search"
+                       value="@search"
+                       class="form-control"
+                       placeholder="Search by category name or description..." />
+
+            </div>
+
+
+            <div class="col-md-3">
+
+                <div class="d-flex gap-2">
+
+                    <button type="submit"
+                            class="btn btn-success flex-grow-1">
+
+                        Search
+
+                    </button>
+
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+
+                        Reset
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+
+@if (Model.Count == 0)
+{
+    <div class="empty-state">
+
+        <div class="empty-icon">
+            C
+        </div>
+
+
+        @if (hasSearch)
+        {
+            <h4>
+                No matching categories
+            </h4>
+
+            <p>
+                No categories match your search.
+            </p>
+
+            <a asp-action="Index"
+               class="btn btn-outline-success">
+
+                Clear Search
+
+            </a>
+        }
+        else
+        {
+            <h4>
+                No categories yet
+            </h4>
+
+            <p>
+                Create your first category before adding products.
+            </p>
+
+            <a asp-action="Create"
+               class="btn btn-success">
+
+                + Add First Category
+
+            </a>
+        }
+
+    </div>
+}
+else
+{
+    <div class="table-responsive categories-table-wrapper">
+
+        <table class="table categories-table align-middle">
+
+            <thead>
+
+                <tr>
+
+                    <th>Category</th>
+
+                    <th>Description</th>
+
+                    <th>Products</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                @foreach (var cat in Model)
+                {
+                    string initial =
+                        !string.IsNullOrWhiteSpace(cat.CategoryName)
+                            ? cat.CategoryName.Substring(0, 1).ToUpper()
+                            : "C";
+
+
+                    <tr>
+
+
+                        <td>
+
+                            <div class="category-main">
+
+                                <div class="category-icon">
+
+                                    @initial
+
+                                </div>
+
+
+                                <div class="category-name">
+
+                                    @cat.CategoryName
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+
+                        <td>
+
+                            @if (!string.IsNullOrWhiteSpace(cat.Description))
+                            {
+                                <span class="description-text">
+
+                                    @cat.Description
+
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">
+
+                                    No description
+
+                                </span>
+                            }
+
+                        </td>
+
+
+
+                        <td>
+
+                            <span class="products-badge">
+
+                                @cat.Products.Count Product(s)
+
+                            </span>
+
+                        </td>
+
+
+
+                        <td>
+
+                            <div class="action-group">
+
+
+                                <a asp-action="Details"
+                                   asp-route-id="@cat.CategoryID"
+                                   class="action-btn details-btn">
+
+                                    Details
+
+                                </a>
+
+
+                                <a asp-action="Edit"
+                                   asp-route-id="@cat.CategoryID"
+                                   class="action-btn edit-btn">
+
+                                    Edit
+
+                                </a>
+
+
+                                <button type="button"
+                                        class="action-btn delete-btn"
+                                        onclick="openDeleteCategoryModal(
+                                    @cat.CategoryID,
+                                    '@Html.Raw(
+                                                                                    System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(
+                                                                                        cat.CategoryName
+                                                                                    )
+                                                                                )'
+                                    )">
+
+                                    Delete
+
+                                </button>
+
+
+                            </div>
+
+                        </td>
+
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+}
+
+
+
+<!-- =========================
+     Delete Modal
+========================= -->
+
+<div class="modal fade"
+     id="deleteCategoryModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-body text-center p-4">
+
+                <div class="delete-modal-icon">
+                    !
+                </div>
+
+                <h4 class="fw-bold">
+                    Delete Category?
+                </h4>
+
+                <p class="text-muted mb-1">
+                    Are you sure you want to delete
+                </p>
+
+                <p class="fw-bold"
+                   id="deleteCategoryName">
+                </p>
+
+                <p class="small text-muted mb-0">
+                    Categories containing products cannot be deleted.
+                </p>
+
+            </div>
+
+
+            <div class="modal-footer border-0 justify-content-center pb-4">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+
+                <form asp-action="Delete"
+                      method="post"
+                      id="deleteCategoryForm">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="id"
+                           id="deleteCategoryId" />
+
+
+                    <button type="submit"
+                            class="btn btn-danger">
+
+                        Yes, Delete Category
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+@section Scripts
+{
+    <script>
+
+        function openDeleteCategoryModal(
+            categoryId,
+            categoryName
+        ) {
+
+            document
+                .getElementById(
+                    'deleteCategoryId'
+                )
+                .value =
+                categoryId;
+
+
+            document
+                .getElementById(
+                    'deleteCategoryName'
+                )
+                .textContent =
+                categoryName;
+
+
+            const modalElement =
+                document.getElementById(
+                    'deleteCategoryModal'
+                );
+
+
+            const modal =
+                bootstrap.Modal.getOrCreateInstance(
+                    modalElement
+                );
+
+
+            modal.show();
+
+        }
+
+    </script>
+}

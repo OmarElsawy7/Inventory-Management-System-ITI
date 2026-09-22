@@ -1,0 +1,718 @@
+@model InventorySystem.Models.Purchase
+
+@{
+    ViewData["Title"] = "Purchase Details";
+}
+
+
+<style>
+
+    /* =========================
+           Header
+        ========================= */
+
+    .purchase-details-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .purchase-title {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 750;
+        color: #1f2937;
+    }
+
+    .purchase-subtitle {
+        margin-top: 5px;
+        margin-bottom: 0;
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    .purchase-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .print-btn {
+        border-radius: 8px;
+        font-weight: 600;
+    }
+
+    .back-btn {
+        border-radius: 8px;
+        font-weight: 600;
+    }
+
+
+    /* =========================
+           Success Alert
+        ========================= */
+
+    .custom-alert {
+        border: none;
+        border-radius: 11px;
+        margin-bottom: 20px;
+    }
+
+
+    /* =========================
+           Document
+        ========================= */
+
+    .purchase-document {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,.05);
+    }
+
+
+    /* =========================
+           Invoice Header
+        ========================= */
+
+    .invoice-top {
+        background: linear-gradient( 135deg, #116b45, #198754 );
+        color: white;
+        padding: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .invoice-brand {
+        font-size: 25px;
+        font-weight: 750;
+        margin-bottom: 5px;
+    }
+
+    .invoice-brand-subtitle {
+        font-size: 13px;
+        color: rgba(255,255,255,.75);
+    }
+
+    .invoice-status {
+        display: inline-block;
+        margin-top: 12px;
+        padding: 5px 11px;
+        border-radius: 50px;
+        background: rgba(255,255,255,.15);
+        border: 1px solid rgba(255,255,255,.20);
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .invoice-number-box {
+        text-align: right;
+    }
+
+    .invoice-label {
+        font-size: 12px;
+        color: rgba(255,255,255,.7);
+        text-transform: uppercase;
+        letter-spacing: .8px;
+    }
+
+    .invoice-number {
+        font-size: 25px;
+        font-weight: 750;
+    }
+
+
+    /* =========================
+           Information
+        ========================= */
+
+    .purchase-info {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        padding: 25px 30px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #fbfcfb;
+    }
+
+    .info-box {
+        padding: 15px;
+        background: white;
+        border: 1px solid #e5ebe7;
+        border-radius: 10px;
+    }
+
+    .info-label {
+        font-size: 11px;
+        color: #7b8781;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+
+    .info-value {
+        color: #1f2937;
+        font-weight: 700;
+        font-size: 15px;
+    }
+
+    .total-highlight {
+        color: #198754;
+        font-size: 17px;
+    }
+
+
+    /* =========================
+           Items
+        ========================= */
+
+    .items-section {
+        padding: 30px;
+    }
+
+    .items-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .items-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .items-count {
+        padding: 5px 11px;
+        background: #e9f7ef;
+        color: #198754;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .items-table {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+        .items-table table {
+            margin-bottom: 0;
+        }
+
+        .items-table thead {
+            background: #f3f6f4;
+        }
+
+        .items-table th {
+            padding: 13px 14px;
+            border-bottom: 1px solid #dde5e0;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .items-table td {
+            padding: 14px;
+            vertical-align: middle;
+            color: #374151;
+        }
+
+    .sku-value {
+        color: #198754;
+        font-weight: 700;
+    }
+
+    .product-name {
+        font-weight: 600;
+    }
+
+    .quantity-badge {
+        display: inline-block;
+        padding: 5px 11px;
+        border-radius: 50px;
+        background: #e9f7ef;
+        color: #198754;
+        font-weight: 700;
+        font-size: 12px;
+    }
+
+    .money-value {
+        font-weight: 600;
+    }
+
+    .grand-total-row {
+        background: #f8faf9;
+    }
+
+    .grand-total-label {
+        text-align: right;
+        font-size: 15px;
+    }
+
+    .grand-total-value {
+        color: #198754;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+
+    /* =========================
+           Footer
+        ========================= */
+
+    .invoice-footer {
+        border-top: 1px solid #e5e7eb;
+        padding: 18px 30px;
+        text-align: center;
+        font-size: 12px;
+        color: #7b8781;
+        background: #fbfcfb;
+    }
+
+
+    @@media(max-width: 768px) {
+
+        .purchase-info {
+            grid-template-columns: 1fr;
+        }
+
+        .invoice-number-box {
+            text-align: left;
+        }
+    }
+
+
+    /* =========================
+           Print Mode
+        ========================= */
+
+    @@media print {
+
+        body {
+            background: white !important;
+        }
+
+        header,
+        footer,
+        .purchase-details-header,
+        .alert,
+        .navbar,
+        .main-footer {
+            display: none !important;
+        }
+
+        .main-content,
+        .container,
+        .page-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            background: white !important;
+        }
+
+        .purchase-document {
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+
+        .invoice-top {
+            background: white !important;
+            color: #111 !important;
+            border-bottom: 2px solid #198754;
+            padding: 20px 0;
+        }
+
+        .invoice-label,
+        .invoice-brand-subtitle {
+            color: #666 !important;
+        }
+
+        .invoice-status {
+            border: 1px solid #aaa !important;
+            color: #111 !important;
+            background: white !important;
+        }
+
+        .purchase-info {
+            background: white !important;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .items-section {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .invoice-footer {
+            background: white !important;
+        }
+
+        .quantity-badge {
+            background: transparent !important;
+            color: #111 !important;
+            padding: 0;
+        }
+
+        .sku-value,
+        .grand-total-value,
+        .total-highlight {
+            color: #111 !important;
+        }
+    }
+
+</style>
+
+
+
+<!-- =========================
+     Success
+========================= -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show custom-alert"
+         role="alert">
+
+        <strong>Success!</strong>
+        @TempData["Success"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close">
+        </button>
+
+    </div>
+}
+
+
+
+<!-- =========================
+     Page Header
+========================= -->
+
+<div class="purchase-details-header">
+
+    <div>
+
+        <h1 class="purchase-title">
+
+            Purchase #@Model.PurchaseID
+
+        </h1>
+
+        <p class="purchase-subtitle">
+
+            Review purchase information and purchased products.
+
+        </p>
+
+    </div>
+
+
+    <div class="purchase-actions">
+
+        <button type="button"
+                class="btn btn-success print-btn"
+                onclick="printPurchase()">
+
+            Print Purchase
+
+        </button>
+
+
+        <a asp-action="Index"
+           class="btn btn-secondary back-btn">
+
+            Back to History
+
+        </a>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     Purchase Document
+========================= -->
+
+<div class="purchase-document"
+     id="purchaseDocument">
+
+
+    <!-- Invoice Header -->
+
+    <div class="invoice-top">
+
+        <div>
+
+            <div class="invoice-brand">
+                Inventory System
+            </div>
+
+            <div class="invoice-brand-subtitle">
+                Purchase Receipt
+            </div>
+
+            <div class="invoice-status">
+                ✓ Purchase Completed
+            </div>
+
+        </div>
+
+
+        <div class="invoice-number-box">
+
+            <div class="invoice-label">
+                Purchase Number
+            </div>
+
+            <div class="invoice-number">
+                #@Model.PurchaseID
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Purchase Information -->
+
+    <div class="purchase-info">
+
+
+        <div class="info-box">
+
+            <div class="info-label">
+                Supplier
+            </div>
+
+            <div class="info-value">
+
+                @(Model.Supplier?.SupplierName ?? "Unknown Supplier")
+
+            </div>
+
+        </div>
+
+
+
+        <div class="info-box">
+
+            <div class="info-label">
+                Purchase Date
+            </div>
+
+            <div class="info-value">
+
+                @(Model.PurchaseDate.ToString("dd/MM/yyyy HH:mm"))
+
+            </div>
+
+        </div>
+
+
+
+        <div class="info-box">
+
+            <div class="info-label">
+                Total Amount
+            </div>
+
+            <div class="info-value total-highlight">
+
+                @(Model.TotalAmount.ToString("N2")) EGP
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- Purchase Items -->
+
+    <div class="items-section">
+
+
+        <div class="items-title-row">
+
+            <div class="items-title">
+                Purchase Items
+            </div>
+
+
+            <div class="items-count">
+
+                @Model.PurchaseItems.Count Item(s)
+
+            </div>
+
+        </div>
+
+
+
+        <div class="table-responsive items-table">
+
+            <table class="table align-middle">
+
+                <thead>
+
+                    <tr>
+
+                        <th>SKU</th>
+
+                        <th>Product</th>
+
+                        <th>Quantity</th>
+
+                        <th>Unit Cost</th>
+
+                        <th>Line Total</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @foreach (var item in Model.PurchaseItems)
+                    {
+                        <tr>
+
+
+                            <td>
+
+                                <span class="sku-value">
+
+                                    @(item.Product?.SKU ?? "-")
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="product-name">
+
+                                    @(item.Product?.ProductName ?? "Unknown Product")
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="quantity-badge">
+
+                                    @item.Quantity
+
+                                </span>
+
+                            </td>
+
+
+                            <td class="money-value">
+
+                                @(item.UnitCost.ToString("N2"))
+                                EGP
+
+                            </td>
+
+
+                            <td class="money-value">
+
+                                @((item.Quantity * item.UnitCost).ToString("N2"))
+                                EGP
+
+                            </td>
+
+
+                        </tr>
+                    }
+
+                </tbody>
+
+
+
+                <tfoot>
+
+                    <tr class="grand-total-row">
+
+                        <th colspan="4"
+                            class="grand-total-label">
+
+                            Purchase Total
+
+                        </th>
+
+
+                        <th class="grand-total-value">
+
+                            @(Model.TotalAmount.ToString("N2"))
+                            EGP
+
+                        </th>
+
+                    </tr>
+
+                </tfoot>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Receipt Footer -->
+
+    <div class="invoice-footer">
+
+        Generated by Inventory Management System
+        &nbsp; | &nbsp;
+        Purchase #@Model.PurchaseID
+
+    </div>
+
+</div>
+
+
+
+@section Scripts
+{
+    <script>
+
+        function printPurchase() {
+
+            window.print();
+
+        }
+
+    </script>
+}

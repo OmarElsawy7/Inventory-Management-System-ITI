@@ -1,0 +1,536 @@
+﻿@model InventorySystem.Models.Category
+
+@{
+    ViewData["Title"] = "Category Details";
+
+    int totalProducts =
+        Model.Products.Count;
+
+    int totalStock =
+        Model.Products.Sum(
+            p => p.StockQuantity
+        );
+
+    int lowStockProducts =
+        Model.Products.Count(
+            p =>
+                p.StockQuantity > 0
+                &&
+                p.StockQuantity <= p.LowStockThreshold
+        );
+
+    int outOfStockProducts =
+        Model.Products.Count(
+            p => p.StockQuantity == 0
+        );
+}
+
+
+<style>
+
+    .category-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .category-title {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 750;
+        color: #1f2937;
+    }
+
+    .category-description {
+        margin-top: 6px;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+
+    /* =========================
+           Hero
+        ========================= */
+
+    .category-hero {
+        padding: 27px;
+        border-radius: 18px;
+        color: white;
+        margin-bottom: 25px;
+        background: linear-gradient( 135deg, #116b45, #198754 );
+        box-shadow: 0 15px 35px rgba(25,135,84,.15);
+    }
+
+    .category-hero-label {
+        font-size: 12px;
+        color: rgba(255,255,255,.65);
+        text-transform: uppercase;
+        letter-spacing: .8px;
+    }
+
+    .category-hero-name {
+        font-size: 28px;
+        font-weight: 750;
+        margin: 5px 0;
+    }
+
+    .category-hero-description {
+        color: rgba(255,255,255,.8);
+        font-size: 14px;
+        margin: 0;
+    }
+
+
+    /* =========================
+           Statistics
+        ========================= */
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 35px;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid #e5ebe7;
+        border-radius: 14px;
+        padding: 20px;
+    }
+
+    .stat-label {
+        color: #7b8781;
+        font-size: 11px;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+        color: #1f2937;
+        font-weight: 750;
+    }
+
+    .green-value {
+        color: #198754;
+    }
+
+    .warning-value {
+        color: #b7791f;
+    }
+
+    .danger-value {
+        color: #dc3545;
+    }
+
+
+    /* =========================
+           Products
+        ========================= */
+
+    .section-title {
+        font-size: 21px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 5px;
+    }
+
+    .section-subtitle {
+        color: #7b8781;
+        font-size: 13px;
+        margin-bottom: 18px;
+    }
+
+    .products-table-wrapper {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .products-table {
+        margin-bottom: 0;
+    }
+
+        .products-table thead {
+            background: #f4f7f5;
+        }
+
+        .products-table th {
+            padding: 13px;
+            font-size: 12px;
+            color: #374151;
+        }
+
+        .products-table td {
+            padding: 13px;
+            vertical-align: middle;
+        }
+
+    .sku {
+        color: #198754;
+        font-weight: 700;
+    }
+
+    .product-name {
+        color: #1f2937;
+        font-weight: 700;
+    }
+
+    .stock-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 50px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .stock-in {
+        background: #e8f7ef;
+        color: #198754;
+    }
+
+    .stock-low {
+        background: #fff4d6;
+        color: #b7791f;
+    }
+
+    .stock-out {
+        background: #fdeaea;
+        color: #dc3545;
+    }
+
+    .empty-state {
+        padding: 45px 20px;
+        text-align: center;
+        border-radius: 14px;
+        border: 1px dashed #cbd5cf;
+        background: #fafcfb;
+        color: #7b8781;
+    }
+
+
+    @@media(max-width: 900px) {
+
+        .stats-grid {
+            grid-template-columns: repeat(2,1fr);
+        }
+    }
+
+
+    @@media(max-width: 600px) {
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+</style>
+
+
+
+<!-- =========================
+     Header
+========================= -->
+
+<div class="category-header">
+
+    <div>
+
+        <h1 class="category-title">
+            Category Details
+        </h1>
+
+        <p class="category-description">
+            Review category information and inventory status.
+        </p>
+
+    </div>
+
+
+    <div class="d-flex gap-2">
+
+        <a asp-action="Edit"
+           asp-route-id="@Model.CategoryID"
+           class="btn btn-outline-success">
+
+            Edit Category
+
+        </a>
+
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+
+            Back
+
+        </a>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     Category Hero
+========================= -->
+
+<div class="category-hero">
+
+    <div class="category-hero-label">
+        Category
+    </div>
+
+    <div class="category-hero-name">
+
+        @Model.CategoryName
+
+    </div>
+
+    <p class="category-hero-description">
+
+        @(string.IsNullOrWhiteSpace(Model.Description)
+            ? "No description provided."
+            : Model.Description)
+
+    </p>
+
+</div>
+
+
+
+<!-- =========================
+     Statistics
+========================= -->
+
+<div class="stats-grid">
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Total Products
+        </div>
+
+        <div class="stat-value green-value">
+
+            @totalProducts
+
+        </div>
+
+    </div>
+
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Total Stock Units
+        </div>
+
+        <div class="stat-value">
+
+            @totalStock
+
+        </div>
+
+    </div>
+
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Low Stock Products
+        </div>
+
+        <div class="stat-value warning-value">
+
+            @lowStockProducts
+
+        </div>
+
+    </div>
+
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Out of Stock
+        </div>
+
+        <div class="stat-value danger-value">
+
+            @outOfStockProducts
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =========================
+     Products
+========================= -->
+
+<h2 class="section-title">
+    Products in this Category
+</h2>
+
+<p class="section-subtitle">
+    Products currently assigned to @Model.CategoryName.
+</p>
+
+
+
+@if (Model.Products.Count == 0)
+{
+    <div class="empty-state">
+
+        <h5 class="fw-bold text-dark">
+            No products in this category
+        </h5>
+
+        <p>
+            Add a product and assign it to this category.
+        </p>
+
+        <a asp-controller="Products"
+           asp-action="Create"
+           class="btn btn-success">
+
+            + Add Product
+
+        </a>
+
+    </div>
+}
+else
+{
+    <div class="table-responsive products-table-wrapper">
+
+        <table class="table table-hover products-table align-middle">
+
+            <thead>
+
+                <tr>
+
+                    <th>SKU</th>
+
+                    <th>Product</th>
+
+                    <th>Unit Price</th>
+
+                    <th>Stock</th>
+
+                    <th>Status</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                @foreach (var product in Model.Products.OrderBy(p => p.ProductName))
+                {
+                    string stockText;
+
+                    string stockClass;
+
+
+                    if (product.StockQuantity == 0)
+                    {
+                        stockText = "Out of Stock";
+                        stockClass = "stock-out";
+                    }
+                    else if (
+                        product.StockQuantity
+                        <=
+                        product.LowStockThreshold
+                    )
+                    {
+                        stockText = "Low Stock";
+                        stockClass = "stock-low";
+                    }
+                    else
+                    {
+                        stockText = "In Stock";
+                        stockClass = "stock-in";
+                    }
+
+
+                    <tr>
+
+                        <td class="sku">
+
+                            @product.SKU
+
+                        </td>
+
+
+                        <td class="product-name">
+
+                            @product.ProductName
+
+                        </td>
+
+
+                        <td>
+
+                            @(product.UnitPrice.ToString("N2")) EGP
+
+                        </td>
+
+
+                        <td>
+
+                            @product.StockQuantity Units
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="stock-badge @stockClass">
+
+                                @stockText
+
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+                            <a asp-controller="Products"
+                               asp-action="Details"
+                               asp-route-id="@product.ProductID"
+                               class="btn btn-sm btn-outline-primary">
+
+                                View Product
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+}

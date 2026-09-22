@@ -1,0 +1,136 @@
+@model InventorySystem.ViewModels.SaleCreateViewModel
+@{
+    ViewData["Title"] = "Create Sale";
+    var products = (List<InventorySystem.Models.Product>)(ViewBag.Products ?? new List<InventorySystem.Models.Product>());
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>Create Sale</h2>
+        <p class="text-muted mb-0">Customer, products and quantities</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">Sales History</a>
+</div>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="card p-3 mb-3">
+        <h5>Customer Information</h5>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="CustomerName" class="form-label"></label>
+                <input asp-for="CustomerName" class="form-control" />
+                <span asp-validation-for="CustomerName" class="text-danger"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Phone" class="form-label"></label>
+                <input asp-for="Phone" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="SaleDate" class="form-label"></label>
+                <input asp-for="SaleDate" type="datetime-local" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Address" class="form-label"></label>
+                <input asp-for="Address" class="form-control" />
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-3">
+        <div class="d-flex justify-content-between">
+            <h5>Sale Items</h5>
+            <button type="button" id="add" class="btn btn-success btn-sm">+ Add Product</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table" id="items">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Available</th>
+                        <th>Unit Price</th>
+                        <th>Quantity</th>
+                        <th>Line Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="text-end fw-bold fs-5">
+            Sale Total: <span id="total">0.00</span>
+        </div>
+    </div>
+
+    <div class="mt-3 text-end">
+        <button class="btn btn-success px-4">Complete Sale</button>
+    </div>
+</form>
+
+<template id="row">
+    <tr>
+        <td>
+            <select class="form-select product" name="Items[__i__].ProductID">
+                <option value="0">Select product</option>
+                @foreach (var p in products)
+                {
+                    <option value="@p.ProductID" data-stock="@p.StockQuantity" data-price="@p.UnitPrice">@p.ProductName</option>
+                }
+            </select>
+        </td>
+        <td class="stock">-</td>
+        <td class="price">0.00</td>
+        <td>
+            <input type="number" min="1" value="1" class="form-control qty" name="Items[__i__].Quantity" />
+        </td>
+        <td class="line">0.00</td>
+        <td>
+            <button type="button" class="btn btn-outline-danger btn-sm remove">Remove</button>
+        </td>
+    </tr>
+</template>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        let i = 0;
+        const tbody = document.querySelector('#items tbody'),
+            tpl = document.querySelector('#row');
+
+        function calc() {
+            let t = 0;
+            tbody.querySelectorAll('tr').forEach(r => {
+                let p = r.querySelector('.product').selectedOptions[0],
+                    q = +r.querySelector('.qty').value || 0,
+                    price = +(p?.dataset.price || 0);
+                r.querySelector('.stock').textContent = p?.dataset.stock ?? '-';
+                r.querySelector('.price').textContent = price.toFixed(2);
+                let l = q * price;
+                r.querySelector('.line').textContent = l.toFixed(2);
+                t += l;
+            });
+            document.querySelector('#total').textContent = t.toFixed(2);
+        }
+
+        function add() {
+            tbody.insertAdjacentHTML('beforeend', tpl.innerHTML.replaceAll('__i__', i++));
+            calc();
+        }
+
+        document.querySelector('#add').onclick = add;
+        tbody.oninput = calc;
+        tbody.onchange = calc;
+        tbody.onclick = e => {
+            if (e.target.classList.contains('remove')) {
+                e.target.closest('tr').remove();
+                calc();
+            }
+        };
+        add();
+    </script>
+}

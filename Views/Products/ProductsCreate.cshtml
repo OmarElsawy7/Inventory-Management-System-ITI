@@ -1,0 +1,55 @@
+﻿@model InventorySystem.Models.Product
+
+@{
+    ViewData["Title"] = "Add Product";
+    List<InventorySystem.Models.Category> categories = ViewBag.Categories;
+}
+
+<h1 class="text-center mb-4">Add New Product</h1>
+
+<form asp-action="Create" method="post" class="w-50 mx-auto">
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label class="form-label">SKU</label>
+        <input asp-for="SKU" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Product Name</label>
+        <input asp-for="ProductName" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Category</label>
+        <select asp-for="CategoryID" class="form-control">
+            @foreach (var cat in categories)
+            {
+                <option value="@cat.CategoryID">@cat.CategoryName</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Unit Price</label>
+        <input asp-for="UnitPrice" class="form-control" />
+        <span asp-validation-for="UnitPrice" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Stock Quantity</label>
+        <input asp-for="StockQuantity" class="form-control" />
+        <span asp-validation-for="StockQuantity" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Low Stock Threshold</label>
+        <input asp-for="LowStockThreshold" class="form-control" />
+    </div>
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-success">Save Product</button>
+    </div>
+
+</form>

@@ -1,0 +1,16 @@
+﻿@model InventorySystem.Models.Product
+
+@{
+    ViewData["Title"] = "Product Details";
+}
+
+<div class="text-center">
+    <h1>@Model.ProductName</h1>
+    <h5>SKU: @Model.SKU</h5>
+    <h5>Category: @Model.Category?.CategoryName</h5>
+    <h5>Price: @Model.UnitPrice EGP</h5>
+    <h5>Stock Quantity: @Model.StockQuantity</h5>
+    <h5>Low Stock Threshold: @Model.LowStockThreshold</h5>
+
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</div>

@@ -1,0 +1,173 @@
+@model InventorySystem.ViewModels.AIAssistantViewModel
+
+@{
+    ViewData["Title"] = "AI Inventory Assistant";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card border-primary shadow-sm">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <span style="font-size: 1.5rem; margin-right: 10px;">🤖</span>
+                    <div>
+                        <h3 class="mb-0">@Model.Title</h3>
+                        <small>@Model.Description</small>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Question Input Area -->
+                    <div class="mb-4">
+                        <label for="questionInput" class="form-label fw-bold">Ask a Question</label>
+                        <div class="input-group">
+                            <input type="text" 
+                                   class="form-control form-control-lg" 
+                                   id="questionInput" 
+                                   placeholder="e.g., Which products are low in stock?" 
+                                   autocomplete="off">
+                            <button class="btn btn-primary btn-lg" id="askButton" type="button">
+                                <span id="askButtonText">Ask AI</span>
+                                <span id="loadingSpinner" class="spinner-border spinner-border-sm ms-2" 
+                                      style="display: none;" role="status" aria-hidden="true"></span>
+                            </button>
+                            <button class="btn btn-secondary btn-lg" id="clearButton" type="button">Clear</button>
+                        </div>
+                    </div>
+
+                    <!-- Sample Questions -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Try These Questions</label>
+                        <div class="row g-2">
+                            @foreach (var question in Model.SampleQuestions)
+                            {
+                                <div class="col-12 col-md-6">
+                                    <button type="button" 
+                                            class="btn btn-outline-info w-100 text-start sample-question-btn" 
+                                            data-question="@question">
+                                        <small>@question</small>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <hr class="my-4" />
+
+                    <!-- Response Area -->
+                    <div>
+                        <label class="form-label fw-bold">AI Response</label>
+                        <div id="responseContainer" style="display: none;">
+                            <div class="alert alert-info">
+                                <small class="text-muted">
+                                    <span id="responseTimestamp"></span>
+                                </small>
+                            </div>
+                            <div class="bg-light p-3 rounded mb-3" id="responseText" style="min-height: 100px; white-space: pre-wrap; word-wrap: break-word; line-height: 1.6;">
+                            </div>
+                        </div>
+                        <div id="noResponseMessage" class="text-muted text-center py-5">
+                            <small>Your AI response will appear here...</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const questionInput = document.getElementById('questionInput');
+            const askButton = document.getElementById('askButton');
+            const clearButton = document.getElementById('clearButton');
+            const responseContainer = document.getElementById('responseContainer');
+            const noResponseMessage = document.getElementById('noResponseMessage');
+            const responseText = document.getElementById('responseText');
+            const responseTimestamp = document.getElementById('responseTimestamp');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const askButtonText = document.getElementById('askButtonText');
+            const sampleQuestionButtons = document.querySelectorAll('.sample-question-btn');
+
+            // Ask Button Click
+            askButton.addEventListener('click', function () {
+                const question = questionInput.value.trim();
+                if (question === '') {
+                    alert('Please enter a question.');
+                    return;
+                }
+                submitQuestion(question);
+            });
+
+            // Enter Key on Question Input
+            questionInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    askButton.click();
+                }
+            });
+
+            // Clear Button Click
+            clearButton.addEventListener('click', function () {
+                questionInput.value = '';
+                responseContainer.style.display = 'none';
+                noResponseMessage.style.display = 'block';
+                responseText.textContent = '';
+                questionInput.focus();
+            });
+
+            // Sample Question Buttons
+            sampleQuestionButtons.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const question = btn.getAttribute('data-question');
+                    questionInput.value = question;
+                    questionInput.focus();
+                });
+            });
+
+            // Submit Question
+            function submitQuestion(question) {
+                // Show loading state
+                askButton.disabled = true;
+                loadingSpinner.style.display = 'inline-block';
+                askButtonText.textContent = 'Processing...';
+
+                fetch('@Url.Action("Query", "AIAssistant")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'question=' + encodeURIComponent(question)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Hide loading state
+                        askButton.disabled = false;
+                        loadingSpinner.style.display = 'none';
+                        askButtonText.textContent = 'Ask AI';
+
+                        if (data.success) {
+                            responseText.textContent = data.response;
+                            responseTimestamp.textContent = 'Response received at ' + data.timestamp;
+                            responseContainer.style.display = 'block';
+                            noResponseMessage.style.display = 'none';
+                        } else {
+                            responseText.textContent = data.message || 'An error occurred while processing your question.';
+                            responseContainer.style.display = 'block';
+                            noResponseMessage.style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        // Hide loading state
+                        askButton.disabled = false;
+                        loadingSpinner.style.display = 'none';
+                        askButtonText.textContent = 'Ask AI';
+
+                        responseText.textContent = 'An error occurred: ' + error.message;
+                        responseContainer.style.display = 'block';
+                        noResponseMessage.style.display = 'none';
+                    });
+            }
+        });
+    </script>
+}

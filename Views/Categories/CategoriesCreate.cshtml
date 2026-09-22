@@ -1,0 +1,165 @@
+﻿@model InventorySystem.Models.Category
+
+@{
+    ViewData["Title"] = "Add Category";
+}
+
+
+<style>
+
+    .form-page {
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        margin-bottom: 25px;
+    }
+
+    .form-title {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 750;
+        color: #1f2937;
+    }
+
+    .form-subtitle {
+        margin-top: 6px;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .category-form-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 8px 25px rgba(0,0,0,.035);
+    }
+
+    .form-label {
+        color: #374151;
+        font-size: 13px;
+        font-weight: 650;
+    }
+
+    .form-control {
+        border-radius: 9px;
+        border-color: #dce4df;
+    }
+
+        .form-control:focus {
+            border-color: #65b98a;
+            box-shadow: 0 0 0 .2rem rgba(25,135,84,.10);
+        }
+
+    textarea.form-control {
+        min-height: 130px;
+        resize: vertical;
+    }
+
+</style>
+
+
+
+<div class="form-page">
+
+
+    <div class="form-header">
+
+        <h1 class="form-title">
+            Add New Category
+        </h1>
+
+        <p class="form-subtitle">
+            Create a category to organize inventory products.
+        </p>
+
+    </div>
+
+
+
+    <div class="category-form-card">
+
+        <form asp-action="Create"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-danger"
+                 role="alert">
+            </div>
+
+
+
+            <div class="mb-4">
+
+                <label asp-for="CategoryName"
+                       class="form-label">
+
+                    Category Name
+
+                </label>
+
+                <input asp-for="CategoryName"
+                       class="form-control"
+                       placeholder="Example: Electronics" />
+
+                <span asp-validation-for="CategoryName"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+
+
+            <div class="mb-4">
+
+                <label asp-for="Description"
+                       class="form-label">
+
+                    Description
+
+                </label>
+
+                <textarea asp-for="Description"
+                          class="form-control"
+                          placeholder="Write a short description for this category...">
+                </textarea>
+
+            </div>
+
+
+
+            <div class="d-flex justify-content-end gap-2">
+
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary">
+
+                    Cancel
+
+                </a>
+
+
+                <button type="submit"
+                        class="btn btn-success px-4">
+
+                    Save Category
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

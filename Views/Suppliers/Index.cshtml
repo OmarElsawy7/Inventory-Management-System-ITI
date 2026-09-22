@@ -1,0 +1,803 @@
+@model List<InventorySystem.Models.Supplier>
+
+@{
+    ViewData["Title"] = "Suppliers";
+}
+
+<style>
+
+    /* =========================
+           Header
+        ========================= */
+
+    .suppliers-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .suppliers-title {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 750;
+        color: #1f2937;
+    }
+
+    .suppliers-subtitle {
+        margin-top: 5px;
+        margin-bottom: 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .supplier-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+        height: 28px;
+        padding: 0 9px;
+        border-radius: 50px;
+        background: #e9f7ef;
+        color: #198754;
+        font-size: 13px;
+        font-weight: 700;
+        margin-left: 7px;
+    }
+
+    .add-supplier-btn {
+        background: #198754;
+        color: white;
+        text-decoration: none;
+        padding: 11px 19px;
+        border-radius: 9px;
+        font-weight: 650;
+        transition: all .2s ease;
+        box-shadow: 0 5px 15px rgba(25, 135, 84, .12);
+    }
+
+        .add-supplier-btn:hover {
+            background: #146c43;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+
+    /* =========================
+           Alerts
+        ========================= */
+
+    .custom-alert {
+        border-radius: 11px;
+        border: none;
+        padding: 14px 16px;
+        margin-bottom: 20px;
+    }
+
+
+    /* =========================
+           Table Container
+        ========================= */
+
+    .suppliers-table-wrapper {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+        background: white;
+    }
+
+    .suppliers-table {
+        margin-bottom: 0;
+    }
+
+        .suppliers-table thead {
+            background: #f5f8f6;
+        }
+
+        .suppliers-table th {
+            color: #374151;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 14px 15px;
+            border-bottom: 1px solid #dfe7e2;
+            white-space: nowrap;
+        }
+
+        .suppliers-table td {
+            vertical-align: middle;
+            padding: 14px 15px;
+            color: #4b5563;
+        }
+
+        .suppliers-table tbody tr {
+            transition: background-color .2s ease;
+        }
+
+            .suppliers-table tbody tr:hover {
+                background: #fbfdfc;
+            }
+
+
+    /* =========================
+           Supplier Identity
+        ========================= */
+
+    .supplier-identity {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .supplier-avatar {
+        width: 39px;
+        height: 39px;
+        border-radius: 10px;
+        background: #e9f7ef;
+        color: #198754;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 750;
+        flex-shrink: 0;
+    }
+
+    .supplier-name {
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .contact-name {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+
+    /* =========================
+           Contact Info
+        ========================= */
+
+    .contact-value {
+        font-size: 13px;
+        color: #4b5563;
+    }
+
+    .not-provided {
+        color: #9ca3af;
+        font-size: 13px;
+        font-style: italic;
+    }
+
+
+    /* =========================
+           Actions
+        ========================= */
+
+    .action-group {
+        display: flex;
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+
+    .action-btn {
+        border-radius: 7px;
+        padding: 7px 11px;
+        font-size: 12px;
+        font-weight: 650;
+        text-decoration: none;
+        border: none;
+        transition: all .2s ease;
+        white-space: nowrap;
+    }
+
+    .details-btn {
+        background: #eef4ff;
+        color: #2563eb;
+    }
+
+        .details-btn:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+    .edit-btn {
+        background: #fff7df;
+        color: #b7791f;
+    }
+
+        .edit-btn:hover {
+            background: #d69e2e;
+            color: white;
+        }
+
+    .delete-btn {
+        background: #fff0f0;
+        color: #dc3545;
+    }
+
+        .delete-btn:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+
+    /* =========================
+           Empty State
+        ========================= */
+
+    .empty-state {
+        background: #fbfdfc;
+        border: 1px dashed #cbd5cf;
+        border-radius: 16px;
+        text-align: center;
+        padding: 55px 25px;
+    }
+
+    .empty-icon {
+        width: 58px;
+        height: 58px;
+        margin: 0 auto 17px;
+        background: #e9f7ef;
+        color: #198754;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+    .empty-state h4 {
+        color: #1f2937;
+        font-weight: 700;
+        margin-bottom: 7px;
+    }
+
+    .empty-state p {
+        color: #7b8781;
+        margin-bottom: 20px;
+    }
+
+
+    /* =========================
+           Modal
+        ========================= */
+
+    .delete-modal-icon {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        background: #fff0f0;
+        color: #dc3545;
+        margin: 0 auto 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+    .modal-content {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0,0,0,.15);
+    }
+
+    .modal-footer {
+        justify-content: center;
+    }
+
+
+    /* =========================
+           Responsive
+        ========================= */
+
+    @@media(max-width: 768px) {
+
+        .suppliers-title {
+            font-size: 27px;
+        }
+
+        .action-group {
+            flex-wrap: wrap;
+        }
+    }
+
+</style>
+
+
+
+<!-- =========================
+     Header
+========================= -->
+
+<div class="suppliers-header">
+
+    <div>
+
+        <h1 class="suppliers-title">
+
+            Suppliers
+
+            <span class="supplier-count">
+                @Model.Count
+            </span>
+
+        </h1>
+
+        <p class="suppliers-subtitle">
+
+            Manage supplier information
+            and purchasing relationships.
+
+        </p>
+
+    </div>
+
+
+    <a asp-action="Create"
+       class="add-supplier-btn">
+
+        + Add New Supplier
+
+    </a>
+
+</div>
+
+
+
+<!-- =========================
+     Success Alert
+========================= -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show custom-alert"
+         role="alert">
+
+        <strong>Success!</strong>
+        @TempData["Success"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close">
+        </button>
+
+    </div>
+}
+
+
+
+<!-- =========================
+     Error Alert
+========================= -->
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show custom-alert"
+         role="alert">
+
+        <strong>Unable to complete action.</strong>
+        @TempData["Error"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close">
+        </button>
+
+    </div>
+}
+
+
+
+<!-- =========================
+     Empty State
+========================= -->
+@if (Model.Count == 0)
+{
+    <div class="empty-state">
+
+        <div class="empty-icon">
+            S
+        </div>
+
+        <h4>
+            No suppliers yet
+        </h4>
+
+        <p>
+            Add your first supplier
+            to start creating purchase transactions.
+        </p>
+
+        <a asp-action="Create"
+           class="add-supplier-btn">
+
+            + Add First Supplier
+
+        </a>
+
+    </div>
+}
+else
+{
+
+    <!-- =========================
+         Suppliers Table
+    ========================= -->
+
+    <div class="table-responsive suppliers-table-wrapper">
+
+        <table class="table suppliers-table align-middle">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Supplier
+                    </th>
+
+                    <th>
+                        Phone
+                    </th>
+
+                    <th>
+                        Email
+                    </th>
+
+                    <th>
+                        Address
+                    </th>
+
+                    <th>
+                        Actions
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                @foreach (var supplier in Model)
+                {
+                    string supplierInitial =
+                        !string.IsNullOrWhiteSpace(supplier.SupplierName)
+                            ? supplier.SupplierName.Substring(0, 1).ToUpper()
+                            : "S";
+
+
+                    <tr>
+
+
+                        <!-- Supplier -->
+
+                        <td>
+
+                            <div class="supplier-identity">
+
+                                <div class="supplier-avatar">
+
+                                    @supplierInitial
+
+                                </div>
+
+
+                                <div>
+
+                                    <div class="supplier-name">
+
+                                        @supplier.SupplierName
+
+                                    </div>
+
+
+                                    <div class="contact-name">
+
+                                        @if (!string.IsNullOrWhiteSpace(supplier.ContactName))
+                                        {
+                                            @supplier.ContactName
+                                        }
+                                        else
+                                        {
+                                            <span>
+                                                No contact name
+                                            </span>
+                                        }
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+
+                        <!-- Phone -->
+
+                        <td>
+
+                            @if (!string.IsNullOrWhiteSpace(supplier.Phone))
+                            {
+                                <span class="contact-value">
+
+                                    @supplier.Phone
+
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="not-provided">
+
+                                    Not provided
+
+                                </span>
+                            }
+
+                        </td>
+
+
+
+                        <!-- Email -->
+
+                        <td>
+
+                            @if (!string.IsNullOrWhiteSpace(supplier.Email))
+                            {
+                                <span class="contact-value">
+
+                                    @supplier.Email
+
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="not-provided">
+
+                                    Not provided
+
+                                </span>
+                            }
+
+                        </td>
+
+
+
+                        <!-- Address -->
+
+                        <td>
+
+                            @if (!string.IsNullOrWhiteSpace(supplier.Address))
+                            {
+                                <span class="contact-value">
+
+                                    @supplier.Address
+
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="not-provided">
+
+                                    Not provided
+
+                                </span>
+                            }
+
+                        </td>
+
+
+
+                        <!-- Actions -->
+
+                        <td>
+
+                            <div class="action-group">
+
+
+                                <!-- Details -->
+
+                                <a asp-action="Details"
+                                   asp-route-id="@supplier.SupplierID"
+                                   class="action-btn details-btn">
+
+                                    Details
+
+                                </a>
+
+
+
+                                <!-- Edit -->
+
+                                <a asp-action="Edit"
+                                   asp-route-id="@supplier.SupplierID"
+                                   class="action-btn edit-btn">
+
+                                    Edit
+
+                                </a>
+
+
+
+                                <!-- Delete -->
+
+                                <button type="button"
+                                        class="action-btn delete-btn"
+                                        onclick="openDeleteModal(
+                                    @supplier.SupplierID,
+                                    '@Html.Raw(
+                                                                                    System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(
+                                                                                        supplier.SupplierName
+                                                                                    )
+                                                                                )'
+                                    )">
+
+                                    Delete
+
+                                </button>
+
+
+                            </div>
+
+                        </td>
+
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+}
+
+
+
+<!-- ==================================================
+     DELETE CONFIRMATION MODAL
+================================================== -->
+
+<div class="modal fade"
+     id="deleteSupplierModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+
+            <div class="modal-body text-center p-4">
+
+
+                <div class="delete-modal-icon">
+
+                    !
+
+                </div>
+
+
+                <h4 class="fw-bold mb-2">
+
+                    Delete Supplier?
+
+                </h4>
+
+
+                <p class="text-muted mb-1">
+
+                    Are you sure you want to delete
+
+                </p>
+
+
+                <p class="fw-bold mb-2"
+                   id="deleteSupplierName">
+
+                </p>
+
+
+                <p class="text-muted small mb-0">
+
+                    Suppliers with existing purchase
+                    history cannot be deleted.
+
+                </p>
+
+
+            </div>
+
+
+
+            <div class="modal-footer border-0 pb-4">
+
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+
+                <a id="confirmDeleteButton"
+                   href="#"
+                   class="btn btn-danger">
+
+                    Yes, Delete Supplier
+
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+@section Scripts
+{
+    <script>
+
+        function openDeleteModal(
+            supplierId,
+            supplierName
+        ) {
+
+            // Show Supplier Name
+            document
+                .getElementById(
+                    'deleteSupplierName'
+                )
+                .textContent =
+                supplierName;
+
+
+            // Build Delete URL
+            const deleteUrl =
+                '@Url.Action("Delete", "Suppliers")'
+                + '?id='
+                + supplierId;
+
+
+            document
+                .getElementById(
+                    'confirmDeleteButton'
+                )
+                .href =
+                deleteUrl;
+
+
+            // Open Bootstrap Modal
+            const modalElement =
+                document.getElementById(
+                    'deleteSupplierModal'
+                );
+
+
+            const modal =
+                bootstrap.Modal
+                    .getOrCreateInstance(
+                        modalElement
+                    );
+
+
+            modal.show();
+
+        }
+
+    </script>
+}

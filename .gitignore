@@ -1,0 +1,29 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio local/user files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / VS Code
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local database artifacts
+*.mdf
+*.ldf
+
+# Logs
+*.log
+
+# Keep the web root and project assets tracked
+!wwwroot/
+!wwwroot/**

@@ -1,0 +1,59 @@
+@model InventorySystem.Models.Sale
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Sales Receipt";
+}
+
+<div class="mx-auto" style="max-width:700px">
+    <div class="d-flex justify-content-between">
+        <div>
+            <h2>Inventory System</h2>
+            <div>Sales Receipt</div>
+        </div>
+        <div class="text-end">
+            <strong>Receipt #@Model.SaleID</strong>
+            <br />
+            @Model.SaleDate.ToString("yyyy-MM-dd HH:mm")
+        </div>
+    </div>
+
+    <hr />
+
+    <p>
+        <strong>Customer:</strong> @Model.CustomerInfo
+    </p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in Model.SaleItems)
+            {
+                <tr>
+                    <td>@i.Product.ProductName</td>
+                    <td>@i.Quantity</td>
+                    <td>@i.UnitPrice.ToString("C")</td>
+                    <td>@i.LineTotal.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+
+    <h3 class="text-end">Total: @Model.TotalAmount.ToString("C")</h3>
+
+    <div class="text-center text-muted mt-4">
+        Thank you for your purchase.
+    </div>
+
+    <div class="text-center mt-3">
+        <button onclick="window.print()" class="btn btn-success">Print Receipt</button>
+    </div>
+</div>
